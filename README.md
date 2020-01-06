@@ -2,7 +2,7 @@
 
 Eye control is a tool that allows you to use your gaze to move mouse.
 
-### Requierements
+## Requierements
 
 * python>=3.6
 * Tensorflow 2
@@ -13,7 +13,7 @@ Eye control is a tool that allows you to use your gaze to move mouse.
 * matplotlib
 * tkinter
 
-### Running
+## Running
 
 At the start of the program you have to calibrate it.
 
