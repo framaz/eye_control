@@ -1,6 +1,6 @@
 # Eye control
 
-Eye control is a tool that allows you to use your gaze to move mouse.
+Eye control is a project that allows you to use your gaze to move mouse cursor.
 
 ## Requierements
 
@@ -12,8 +12,16 @@ Eye control is a tool that allows you to use your gaze to move mouse.
 * numpy
 * matplotlib
 * tkinter
+* Jupyter notebook (if you want to train your NN yourself)
 
-## Running
+## Project structure
+
+The project is **divided into 2 parts**
+
+* NN supervised learning. It is located in /, the main files are some .ipynb. Currently the project is using [MPIIGaze](https://www.mpi-inf.mpg.de/departments/computer-vision-and-machine-learning/research/gaze-based-human-computer-interaction/appearance-based-gaze-estimation-in-the-wild/), you can download it or use different dataset.
+* Watcher - gaze estimation to control mouse cursor. It is located in /watcher/.
+
+## Running the watcher
 
 At the start of the program you have to calibrate it.
 
