@@ -5,6 +5,7 @@ import time
 import matplotlib.pyplot as plt
 import imgaug as iaa
 import numpy as np
+import camera_holders
 from PIL import Image
 
 import eye_module
@@ -34,15 +35,19 @@ def rotate(img, points, angle):
 
 
 def smooth_n_cut(time_list, time_now):
-    while abs(time_list[0][2] - time_now) > SECOND_SMOOTH_TIME:
+    while abs(time_list[0][-1] - time_now) > SECOND_SMOOTH_TIME:
         time_list.popleft()
     return smooth_func(time_list, time_now, FIRST_SMOOTH_TIME, SECOND_SMOOTH_TIME)
 
 
 def smooth_func(time_list, time_now, first_part_time, second_part_time):
-    ave_x, ave_y = 0., 0.
+    if not isinstance(time_list, np.ndarray):
+        time_list = np.array(time_list)
+    ave = np.zeros((len(time_list[0])-1), dtype=np.float32)
     total_weight = 0.
-    for x, y, time in time_list:
+    for cur_time in time_list:
+        time = cur_time[-1]
+        value = cur_time[0:len(cur_time)-1]
         weight = 0
         if abs(time_now - time) < first_part_time:
             weight = 1
@@ -52,12 +57,12 @@ def smooth_func(time_list, time_now, first_part_time, second_part_time):
             weight = 1. - (time) * tang
         else:
             break
-        ave_x += x * weight
-        ave_y += y * weight
+        ave += value * weight
         total_weight += weight
     if total_weight == 0:
         total_weight = 1
-    return ave_x / total_weight, ave_y / total_weight
+    ave = ave / total_weight
+    return ave
 
 
 def get_linear_equation(p1, p2):
@@ -91,34 +96,42 @@ def get_distance_to_line(p1, p2, p_target):
 class Calibrator:
     def __init__(self):
         self.points = np.zeros((len(corner_dict), 2), dtype=np.float32)
-
-        self.calibration_history = collections.deque()
+        self.calibration_history_left = collections.deque()
+        self.calibration_history_right = collections.deque()
         self.last_time = 0
+        self.left_eye = camera_holders.Eye()
+        self.right_eye = camera_holders.Eye()
 
     def calibrate_remember(self, img, time_now):
-
-        result = predictor.predict(img, time_now)
-
+        result = predictor.predict_eye_vector(img, time_now)
         self.last_time = time_now
         if not (result is None):
-            _, coords, _ = result
-            self.calibration_history.append((coords[0], coords[1], time_now))
-
-        return smooth_n_cut(self.calibration_history, time_now)
+            _, left_eye_vect, right_eye_vect, _ = result
+            left_eye_vect = np.append(left_eye_vect, time_now)
+            right_eye_vect = np.append(right_eye_vect, time_now)
+            self.calibration_history_left.append(left_eye_vect)
+            self.calibration_history_right.append(right_eye_vect)
+        return str(smooth_n_cut(self.calibration_history_left, time_now)) + str(smooth_n_cut(self.calibration_history_right, time_now))
 
     def calibration_end(self, corner):
         if isinstance(corner, str):
             corner = corner_dict[corner]
-        x, y = smooth_func(self.calibration_history, self.last_time, FIRST_SMOOTH_TIME,
+        left = smooth_func(self.calibration_history_left, self.last_time, FIRST_SMOOTH_TIME,
                            SECOND_SMOOTH_TIME)
-        self.points[corner, 0] = x
-        self.points[corner, 1] = y
-        self.calibration_history = collections.deque()
-
-    def create_translator(self):
-        plt.plot(self.points[:,0], -self.points[:,1])
-        plt.show()
-        return SeenToScreenTranslator(self.points)
+        right = smooth_func(self.calibration_history_right, self.last_time, FIRST_SMOOTH_TIME,
+                           SECOND_SMOOTH_TIME)
+        self.left_eye.corner_vectors[corner] = left
+        self.right_eye.corner_vectors[corner] = right
+        self.calibration_history_left = collections.deque()
+        self.calibration_history_right = collections.deque()
+    def calibration_final(self):
+        self.left_eye.create_translator()
+        self.right_eye.create_translator()
+        return self.left_eye, self.right_eye
+   # def create_translator(self):
+   #     self.left_eye.create_translator()
+   #     self.right_eye.create_translator()
+   #     return 0#SeenToScreenTranslator(self.points)
 
 
 def get_screen_point_array(width, heigth):
@@ -295,4 +308,4 @@ class RotationTranslation(BasicTranslation):
         return f"{super().__str__()}: {self.angle}"
 
     def get_modification_data(self):
-        return self.angle,
+        return self.angle
