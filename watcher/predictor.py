@@ -104,6 +104,7 @@ def normalize(v):
 
 
 def predict(img, time_now, configurator=None):
+    cur_time = time.time()
     np_points, resizing_cropper, img = process_pic(np.array(img))
     if np_points is not None:
         try:
@@ -142,6 +143,7 @@ def predict(img, time_now, configurator=None):
             face = face.astype(dtype=np.uint8).reshape(36, 60)
             face = Image.fromarray(face)
             face = face.resize((60 * 5, 36 * 5))
+            print(time.time() - cur_time)
             return face, results, tmp_out_inform
         except:
             pass

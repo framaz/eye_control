@@ -7,3 +7,5 @@
 *~
 checkpoint_path*
 !checkpoint_path
+cam_params.txt
+__pycache__

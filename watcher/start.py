@@ -32,6 +32,10 @@ app = drawer.App(tk.Tk(), "Tkinter and OpenCV", button_callback)
 # Create a window and pass it to the Application object
 
 cam = VideoCapture(0)
+
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+print(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
 if not NO_CALIB_DEBUG:
     cycling_flag = True
     offsets = []
