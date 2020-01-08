@@ -13,6 +13,7 @@ import drawer
 import eye_module
 import predictor
 import operator
+import camera_holders
 from functools import partial
 
 from predictor import pixel_func, process_pic, model
@@ -32,59 +33,58 @@ app = drawer.App(tk.Tk(), "Tkinter and OpenCV", button_callback)
 # Create a window and pass it to the Application object
 
 cam = VideoCapture(0)
-
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-print(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+cam = camera_holders.CameraHolder(cam)
+cameras = list()
+cameras.append(cam)
 if not NO_CALIB_DEBUG:
     cycling_flag = True
-    offsets = []
-    angles = []
-    while cycling_flag:
-        ret, img = cam.read()
-        time_now = time.time()
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = Image.fromarray(img)
-        # img = img.resize((500, 500))
-        try:
-            face, results, out_inform = predictor.predict(img, time_now)
-            app.draw_image(face)
-            offsets.append(out_inform["cutter"])
-            angles.append(out_inform["rotator"])
-            # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
-        except:
-            app.draw_image(img)
-    offsets = list(map(operator.itemgetter(0), offsets[-20: -1]))
-    angles = list(map(operator.itemgetter(0), angles[-20: -1]))
-    offset, angle = 0, 0
-    for off, ang in zip(offsets, angles):
-        offset += off
-        angle += ang
-    offset /= len(offsets)
-    angle /= len(angles)
-    calibrator_obj = calibrator.Calibrator()
+    # offsets = []
+    # angles = []
+    # while cycling_flag:
+    #    ret, img = cam.read()
+    #    time_now = time.time()
+    #    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #    img = Image.fromarray(img)
+    #    # img = img.resize((500, 500))
+    #    try:
+    #        face, results, out_inform = predictor.predict(img, time_now)
+    #        app.draw_image(face)
+    #        offsets.append(out_inform["cutter"])
+    #        angles.append(out_inform["rotator"])
+    #        # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
+    #    except:
+    #        app.draw_image(img)
+    # offsets = list(map(operator.itemgetter(0), offsets[-20: -1]))
+    # angles = list(map(operator.itemgetter(0), angles[-20: -1]))
+    # offset, angle = 0, 0
+    # for off, ang in zip(offsets, angles):
+    #    offset += off
+    #    angle += ang
+    # offset /= len(offsets)
+    # angle /= len(angles)
+    offset = 0
+    angle = 0
     for corner in calibrator.corner_dict:
         cycling_flag = True
         app.change_corner(corner)
         last_time = time.time()
         while cycling_flag:
-
-            ret, img = cam.read()
             time_now = time.time()
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            img = Image.fromarray(img)
-            # img = img.resize((500, 500))
+            for camera in cameras:
+                try:
+                    cur_time = time.time()
+                    app.draw_eye(None,camera.calibration_tick(cur_time))
+                    last_time = cur_time
+                    # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
+                except:
+                    pass
+        for camera in cameras:
+            camera.calibration_corner_end(corner)
 
-            #   app.draw_image(img)
-            try:
-                cur_time = time.time()
-                app.draw_eye(None, str(calibrator_obj.calibrate_remember(img, time_now))+" " + str(cur_time-last_time))
-                last_time = cur_time
-                # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
-            except:
-                pass
-        calibrator_obj.calibration_end(corner)
-    translator = calibrator_obj.create_translator()
+    for camera in cameras:
+           camera.calibration_end()
 while True:
     ret, img = cam.read()
     time_now = time.time()
@@ -117,5 +117,5 @@ while True:
         else:
             app.draw_eye(None, str(results))
     except Exception as e:
-        e=e
+        e = e
         app.draw_image(img)
