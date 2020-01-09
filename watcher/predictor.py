@@ -9,6 +9,7 @@ import calibrator
 import eye_module
 import copy
 import model as model_gen
+import image_translation
 import camera_holders
 import matplotlib.pyplot as plt
 
@@ -149,20 +150,21 @@ def predict_eye_vector(imgs, time_now, configurator=None):
                 tmp_out_informs.append(tmp_out_inform)
             except:
                 pass
-    return face, eye_one_vector, eye_two_vector, tmp_out_inform
+    return faces, eye_one_vectors, eye_two_vectors, tmp_out_informs
 
 
 def predict(cameras, time_now, configurator=None):
     imgs = []
     for camera in cameras:
         imgs.append(camera.get_picture())
-    face, eye_one_vector, eye_two_vector, tmp_out_inform = predict_eye_vector(imgs, time_now, configurator)
-    res = np.array([eye_one_vector, eye_two_vector])
-    res_pixel = pixel_func(res)
-    res_pixel = res_pixel.numpy()
-    for i in range(res_pixel.shape[0]):
-        history.append((res_pixel[i, 0], res_pixel[i, 1], time_now))
-    results = calibrator.smooth_n_cut(history, time_now)
-    if not isinstance(face, Image.Image):
-        face = Image.fromarray(face)
-    return face, results, tmp_out_inform
+    faces, eye_one_vectors, eye_two_vectors, tmp_out_informs = predict_eye_vector(imgs, time_now, configurator)
+    results = []
+    for i, camera in zip(range(len(cameras)), cameras):
+        results.append(camera.update_gazes_history(eye_one_vectors[i], eye_two_vectors[i],time_now))
+    def face_to_img(face):
+        if not isinstance(face, Image.Image):
+            face = Image.fromarray(face)
+        return face
+    faces = list(map(lambda face: face_to_img(face), faces))
+    faces = image_translation.pack_to_one_image(*faces)
+    return faces, results, tmp_out_informs

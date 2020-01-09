@@ -99,8 +99,8 @@ class Calibrator:
         self.calibration_history_left = collections.deque()
         self.calibration_history_right = collections.deque()
         self.last_time = 0
-        self.left_eye = camera_holders.Eye()
-        self.right_eye = camera_holders.Eye()
+        self.left_eye = camera_holders.Eye(eye_type='l')
+        self.right_eye = camera_holders.Eye(eye_type='r')
 
     def calibrate_remember(self, img, time_now):
         result = predictor.predict_eye_vector(img, time_now)
@@ -125,8 +125,9 @@ class Calibrator:
         self.calibration_history_left = collections.deque()
         self.calibration_history_right = collections.deque()
     def calibration_final(self):
-        self.left_eye.create_translator()
-        self.right_eye.create_translator()
+        screen = camera_holders.Screen(self.left_eye, self.right_eye)
+        self.left_eye.create_translator(screen)
+        self.right_eye.create_translator(screen)
         return self.left_eye, self.right_eye
    # def create_translator(self):
    #     self.left_eye.create_translator()
@@ -135,10 +136,11 @@ class Calibrator:
 
 
 def get_screen_point_array(width, heigth):
-
+    global points_in_square
+    points = copy.deepcopy(points_in_square)
     for i in range(len(points_in_square)):
-        points_in_square[i] = points_in_square[i][0] * width, points_in_square[i][1] * heigth
-    result = list_points_to_triangle(points_in_square)
+        points[i] = points[i][0] * width, points[i][1] * heigth
+    result = list_points_to_triangle(points)
     return np.array(result, dtype=np.float32)
 
 

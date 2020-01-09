@@ -86,25 +86,25 @@ if not NO_CALIB_DEBUG:
     for camera in cameras:
            camera.calibration_end()
 while True:
-    ret, img = cam.read()
     time_now = time.time()
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img = Image.fromarray(img)
-    # img = img.resize((500, 500))
-
-    #   app.draw_image(img)
     try:
-        face, results, out_inform = predictor.predict(img, time_now)
+        face, results, out_inform = predictor.predict(cameras, time_now)
 
         app.draw_image(face)
 
         if not NO_CALIB_DEBUG:
-            out_inform["rotator"] -= angle
-            out_inform["cutter"] -= offset
+            #out_inform["rotator"] -= angle
+            #out_inform["cutter"] -= offset
             print(str(out_inform))
-            results = translator.seen_to_screen(results)
             app.draw_eye(None, str(results))
-            results = list(results)
+            result = list(results)
+            results = [0, 0]
+            for cam in result:
+                for eye in cam:
+                    results[0] += eye[0]
+                    results[1] += eye[1]
+            results[0] /= len(result) * 2
+            results[1] /= len(result) * 2
             if results[0] < 0:
                 results[0] = 0
             if results[1] < 0:
@@ -118,4 +118,4 @@ while True:
             app.draw_eye(None, str(results))
     except Exception as e:
         e = e
-        app.draw_image(img)
+     #   app.draw_image(face)
