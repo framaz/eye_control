@@ -9,4 +9,4 @@ checkpoint_path*
 !checkpoint_path
 cam_params.txt
 __pycache__
-.idea/workspace.xml
+watcher/.idea/workspace.xml
