@@ -6,6 +6,12 @@ import numpy as np
 import os
 from local_directory_change_decorator import path_change_decorator
 
+model_list = [
+    30, 31, 33, 35, 26, 28, 29, 30,  # nose
+    18, 19, 20, 21,  # left eyebrow
+    22, 23, 24, 25   # right eyebrow
+]
+
 
 class PoseEstimator:
     """Estimate head pose according to the facial landmarks"""
@@ -24,6 +30,7 @@ class PoseEstimator:
         ]) / 4.5
 
         self.model_points_68 = self._get_full_model_points()
+        self.model_points = self.get_pose_marks(self.model_points_68)
 
         # Camera internals
         self.focal_length = self.size[1]
@@ -80,8 +87,9 @@ class PoseEstimator:
         Solve pose from image points
         Return (rotation_vector, translation_vector) as pose.
         """
-        #assert image_points.shape[0] == self.model_points_68.shape[
-        #    0], "3D points and 2D points should be of same number."
+        if image_points.shape[0] == self.model_points_68.shape[0]:
+            image_points = self.get_pose_marks(image_points)
+        assert image_points.shape[0] == self.model_points.shape[0], "3D points and 2D points should be of same number."
         image_points = np.array(image_points, dtype=np.float64)
         (_, rotation_vector, translation_vector) = cv2.solvePnP(
             self.model_points, image_points, self.camera_matrix, self.dist_coeefs)
@@ -148,7 +156,7 @@ class PoseEstimator:
         point_2d = np.float64(point_2d.reshape(-1, 2))
 
         # Draw all the lines
-        image = np.array(image,dtype=np.float64)
+        image = np.array(image, dtype=np.float64)
         cv2.polylines(image, [point_2d], True, color, line_width, cv2.LINE_AA)
         cv2.line(image, tuple(point_2d[1]), tuple(
             point_2d[6]), color, line_width, cv2.LINE_AA)
@@ -179,10 +187,15 @@ class PoseEstimator:
     def get_pose_marks(self, marks):
         """Get marks ready for pose estimation from 68 marks"""
         pose_marks = []
+        for mark in model_list:
+            pose_marks.append(marks[mark])
+        '''
         pose_marks.append(marks[30])  # Nose tip
         pose_marks.append(marks[8])  # Chin
         pose_marks.append(marks[36])  # Left eye left corner
         pose_marks.append(marks[45])  # Right eye right corner
         pose_marks.append(marks[48])  # Mouth left corner
         pose_marks.append(marks[54])  # Mouth right corner
+        '''
+        pose_marks = np.array(pose_marks)
         return pose_marks
