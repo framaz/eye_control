@@ -36,3 +36,7 @@ Next step you have to do with **fixed head position**, dont move your head etc.
 4. Use the program.
 
 **If you move the camera or the screen then you have to restart the program**
+
+## Special thanks
+
+*  yinguobing for pnp solve module from [Head pose estimation project](https://github.com/yinguobing/head-pose-estimation) 

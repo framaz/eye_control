@@ -1,8 +1,7 @@
+import numpy as np
+import from_internet_or_for_from_internet.PNP_solver as pnp_solver
+import os
 if __name__ == "__main__":
-    import calibrator
-    timed_list = [
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [2, 2, 2, 2]
-    ]
-    calibrator.smooth_n_cut(timed_list, 2)
+    print(os.getcwd())
+    kek = pnp_solver.PoseEstimator()
+    print(os.getcwd())
