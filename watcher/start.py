@@ -1,3 +1,4 @@
+
 import asyncio
 import time
 import tkinter as tk
@@ -47,22 +48,25 @@ if not NO_CALIB_DEBUG:
             img = camera.get_picture()
             # img = img.resize((500, 500))
             try:
-                np_points, _, face = predictor.detect_face_points_dlib(img, False)
                 enhancer = data_enhancer.WidthHeightDataEnhancer(text_size=30)
-                pic, output = enhancer.process(face, np_points)
-                cur_time = time.time()
-                r1, r2 = solver.solve_pose(solver.get_pose_marks(np_points))
-                print(time.time()-cur_time)
-                pic = solver.draw_axes(pic, r1, r2)
-                pic = pic.astype(dtype=np.uint8)
-                pic = Image.fromarray(pic)
+                #pic, output = enhancer.process(face, np_points)
+                #enhancer = data_enhancer.HeadPositionAxisDataEnhancer()
+                #pic, output = enhancer.process(face, np_points)
+
+                enhancer = data_enhancer.HeadNEyeDataEnhancer()
+
+                [faces], [eye_one_vectors], [eye_two_vectors], [np_points], _ = predictor.predict_eye_vector_and_face_points([img], time.time(), )
+
+                pic, output = enhancer.process(faces, np_points, eye_one_vectors, eye_two_vectors)
                 app.draw_image(pic, max_size="large")
+
                 # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
             except:
                 app.draw_image(img)
     offset, angle = 0, 0
     offset = 0
     angle = 0
+
     for corner in calibrator.corner_dict:
         cycling_flag = True
         app.change_corner(corner)
@@ -82,6 +86,7 @@ if not NO_CALIB_DEBUG:
 
     for camera in cameras:
         camera.calibration_end()
+
 while True:
     time_now = time.time()
     try:

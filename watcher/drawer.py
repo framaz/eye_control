@@ -28,9 +28,13 @@ class App:
         self.corner_num.text = corner
         self.corner_num.config(text=corner)
 
-    def draw_image(self, image: Image.Image):
-        if image.height > 640:
-            image = image.resize((512, int(512 * image._size[1] / image._size[0])))
+    def draw_image(self, image: Image.Image, max_size="small"):
+        if not(isinstance(image, Image.Image)):
+            image = image.astype(dtype=np.uint8)
+            image = Image.fromarray(image)
+        max_size = {"small": 512, "medium": 1024, "large": 1536, "no": 10000000}[max_size]
+        if image.height > max_size:
+            image = image.resize((max_size, int(max_size * image._size[1] / image._size[0])))
         img = ImageTk.PhotoImage(image)
         self.panel.image = img
         self.panel.configure(image=img)

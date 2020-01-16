@@ -11,7 +11,7 @@ model_list = [
     18, 19, 20, 21,  # left eyebrow
     22, 23, 24, 25   # right eyebrow
 ]
-
+model_list = [i for i in range(68)]
 
 class PoseEstimator:
     """Estimate head pose according to the facial landmarks"""
@@ -34,6 +34,7 @@ class PoseEstimator:
 
         # Camera internals
         self.focal_length = self.size[1]
+
         self.camera_center = (self.size[1] / 2, self.size[0] / 2)
         self.camera_matrix = np.array(
             [[self.focal_length, 0, self.camera_center[0]],
@@ -116,14 +117,13 @@ class PoseEstimator:
             self.r_vec = rotation_vector
             self.t_vec = translation_vector
 
-        (_, rotation_vector, translation_vector) = cv2.solvePnP(
-            self.model_points_68,
-            image_points,
-            self.camera_matrix,
-            self.dist_coeefs,
-            rvec=self.r_vec,
-            tvec=self.t_vec,
-            useExtrinsicGuess=True)
+        (_, rotation_vector, translation_vector) = cv2.solvePnP(self.model_points_68,
+                                                                image_points,
+                                                                self.camera_matrix,
+                                                                self.dist_coeefs,
+                                                                rvec=self.r_vec,
+                                                                tvec=self.t_vec,
+                                                                useExtrinsicGuess=True)
 
         return (rotation_vector, translation_vector)
 

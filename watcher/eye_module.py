@@ -1,12 +1,12 @@
 import numpy as np
 from PIL import Image
 
-eye_padding = 0
+eye_padding_ratio = 1.2
 def slice_eye(img, parts):
-    left = min(parts[:, 0]) - eye_padding
-    top = min(parts[:, 1]) - eye_padding
-    right = max(parts[:, 0]) + eye_padding
-    bottom = max(parts[:, 1]) + eye_padding
+    left = min(parts[:, 0])
+    top = min(parts[:, 1])
+    right = max(parts[:, 0])
+    bottom = max(parts[:, 1])
     size, middle_x, middle_y = 0, 0, 0
     if right - left >= top - bottom:
         size = right - left
@@ -18,10 +18,10 @@ def slice_eye(img, parts):
     ratio = 60. / 36.
     middle_y = int((top + bottom) / 2)
     middle_x = int((left + right) / 2)
-    bottom = int(middle_y + size / ratio / 2)
-    top = int(middle_y - size / ratio / 2)
-    left = int(middle_x - size / 2)
-    right = int(middle_x + size / 2)
+    bottom = int(middle_y + size / ratio / 2 * eye_padding_ratio)
+    top = int(middle_y - size / ratio / 2 * eye_padding_ratio)
+    left = int(middle_x - size / 2 * eye_padding_ratio)
+    right = int(middle_x + size / 2 * eye_padding_ratio)
     result = img[top:bottom, left:right]
     return result, left, top
 

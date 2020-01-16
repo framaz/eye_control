@@ -1,5 +1,7 @@
 from functools import partial
 import collections
+from math import sqrt
+
 import dlib
 import numpy as np
 import tensorflow as tf
@@ -12,14 +14,17 @@ import model as model_gen
 import image_translation
 import camera_holders
 import matplotlib.pyplot as plt
+import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 
 
-def process_pic(src):
-    img = src
+def detect_face_points_dlib(src, cropping_needed=True):
+    img = copy.deepcopy(src)
     cur_time = time.time()
     smaller_img = copy.deepcopy(img)
-    smaller_img = Image.fromarray(smaller_img)
-    smaller_img = smaller_img.resize((512, int(512 * smaller_img._size[1] / smaller_img._size[0])))
+    if not (isinstance(src, Image.Image)):
+        smaller_img = Image.fromarray(smaller_img)
+    smaller_img_size = (512, int(512 * smaller_img._size[1] / smaller_img._size[0]))
+    smaller_img = smaller_img.resize(smaller_img_size)
     smaller_img = np.array(smaller_img)
     try:
         smaller_dets = detector(smaller_img, 0)
@@ -37,8 +42,15 @@ def process_pic(src):
         for i in range(shape.num_parts):
             np_points[i, 0] = shape.part(i).x
             np_points[i, 1] = shape.part(i).y
-
-        return np_points, resizing_cropper, img
+        if cropping_needed:
+            return np_points, resizing_cropper, img
+        else:
+            offset = list(resizing_cropper.get_resulting_offset())
+            # offset[0] *= src.width/smaller_img_size[0]
+            # offset[1] *= src.height / smaller_img_size[1]
+            for i in range(shape.num_parts):
+                np_points[i] += offset
+            return np_points, resizing_cropper, src
     except:
         pass
 
@@ -95,35 +107,43 @@ calibration_results = np.zeros((4, 2), dtype=np.float32)
 calibration_history = []
 
 
-def calibration_predict(img, time_now):
-    _, point = predict_eye_vector(img, time_now)
-
-
 def normalize(v):
-    norm = np.linalg.norm(v)
+    norm = 0
+    for vi in v:
+        norm += vi * vi
+    norm = sqrt(norm)
     if norm == 0:
         return v
     return v / norm
 
 
-def predict_eye_vector(imgs, time_now, configurator=None):
+solver = pnp_solver.PoseEstimator((1080, 1920))
+
+
+def predict_eye_vector_and_face_points(imgs, time_now, configurator=None):
     faces = []
     eye_one_vectors = []
     eye_two_vectors = []
+    np_points_all = []
     tmp_out_informs = []
+
     for img in imgs:
-        np_points, resizing_cropper, img = process_pic(np.array(img))
+        np_points, resizing_cropper, img = detect_face_points_dlib(np.array(img), cropping_needed=False)
         if np_points is not None:
             try:
                 tmp_out_inform = {}
+                face = img
                 #    np_points[i] = rotate_point(np_points[i], middle, -angle)
-                face_cutter = calibrator.FaceCropper(np_points)
-                face, np_points = face_cutter.apply_forth(img)
+
+                #face_cutter = calibrator.FaceCropper(np_points)
+                #face, np_points = face_cutter.apply_forth(img)
                 rotator = calibrator.RotationTranslation(np_points)
-                face, np_points = rotator.apply_forth(face)
-                tmp_out_inform["cutter"] = face_cutter.get_modification_data()
-                tmp_out_inform["rotator"] = rotator.get_modification_data()
+                face, np_points = rotator.apply_forth(img)
+                to_out_face = face
+                #tmp_out_inform["cutter"] = face_cutter.get_modification_data()
+                #tmp_out_inform["rotator"] = rotator.get_modification_data()
                 eyes = []
+
                 eyes.append(eye_module.process_eye(face, np_points[36:42]))
                 eyes.append(eye_module.process_eye(face, np_points[42:48]))
                 eyes_to_predict = []
@@ -132,7 +152,6 @@ def predict_eye_vector(imgs, time_now, configurator=None):
                 res = model.predict(np.array(eyes_to_predict))
                 eye_one_vector = normalize(res[0])
                 eye_two_vector = normalize(res[1])
-
                 face = Image.fromarray(face)
                 drawer = ImageDraw.Draw(face)
                 # #   for [x, y] in np_points:
@@ -144,27 +163,33 @@ def predict_eye_vector(imgs, time_now, configurator=None):
                 face = face.astype(dtype=np.uint8).reshape(36, 60)
                 face = Image.fromarray(face)
                 face = face.resize((60 * 5, 36 * 5))
-                faces.append(face)
+                faces.append(to_out_face)
                 eye_one_vectors.append(eye_one_vector)
                 eye_two_vectors.append(eye_two_vector)
+                np_points_all.append(np_points)
                 tmp_out_informs.append(tmp_out_inform)
             except:
                 pass
-    return faces, eye_one_vectors, eye_two_vectors, tmp_out_informs
+
+    return faces, eye_one_vectors, eye_two_vectors, np_points_all, tmp_out_informs
 
 
-def predict(cameras, time_now, configurator=None):
+def predict(cameras, time_now, ):
     imgs = []
     for camera in cameras:
         imgs.append(camera.get_picture())
-    faces, eye_one_vectors, eye_two_vectors, tmp_out_informs = predict_eye_vector(imgs, time_now, configurator)
+
+    faces, eye_one_vectors, eye_two_vectors, np_points_all, tmp_out_informs = predict_eye_vector_and_face_points(imgs, time_now, )
+
     results = []
     for i, camera in zip(range(len(cameras)), cameras):
-        results.append(camera.update_gazes_history(eye_one_vectors[i], eye_two_vectors[i],time_now))
+        results.append(camera.update_gazes_history(eye_one_vectors[i], eye_two_vectors[i], np_points_all[i], time_now))
+
     def face_to_img(face):
         if not isinstance(face, Image.Image):
             face = Image.fromarray(face)
         return face
+
     faces = list(map(lambda face: face_to_img(face), faces))
     faces = image_translation.pack_to_one_image(*faces)
     return faces, results, tmp_out_informs
