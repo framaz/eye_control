@@ -141,7 +141,7 @@ class Calibrator:
         rotation = smooth_n_cut(self.calibration_history_head_rotation, self.calibration_history_head_rotation[0][-1])
         translation = smooth_n_cut(self.calibration_history_head_translation, self.calibration_history_head_rotation[0][-1])
         head = camera_holders.Head(rotation, translation, self.solver)
-        screen = camera_holders.Screen(self.left_eye, self.right_eye)
+        screen = camera_holders.Screen(self.left_eye, self.right_eye, self.solver, rotation, translation)
         world_to_camera = camera_holders.vector_to_camera_coordinate_system(rotation, translation)
         left_eye = head.solver.model_points_68[36] + head.solver.model_points_68[39]
         left_eye = np.array([*left_eye, 1])

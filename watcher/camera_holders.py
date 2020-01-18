@@ -4,6 +4,7 @@ import copy
 import cv2
 import PIL
 import calibrator
+import plane_by_eye_vectors
 import predictor
 import numpy as np
 import matplotlib.pyplot as plt
@@ -55,9 +56,11 @@ class CameraHolder:
         head_rotation, head_translation = self.head.add_history(np_points, time_now)
         world_to_camera = vector_to_camera_coordinate_system(head_rotation, head_translation)
         left_eye = self.head.solver.model_points_68[36] + self.head.solver.model_points_68[39]
+        left_eye /= 2
         left_eye = np.array([*left_eye, 1])
         left_eye = np.matmul(world_to_camera, left_eye)
         right_eye = self.head.solver.model_points_68[42] + self.head.solver.model_points_68[45]
+        right_eye /= 2
         right_eye = np.array([*right_eye, 1])
         right_eye = np.matmul(world_to_camera, right_eye)
         eye_one_screen = self.l_eye.add_history(eye_one_vector, time_now, left_eye)
@@ -76,7 +79,7 @@ class Eye:
         assert eye_type == 'l' or eye_type == 'r'
         self.corner_vectors = np.zeros((len(calibrator.corner_dict), 3))
         self.translator = None
-        self.point_vectors = np.zeros((len(calibrator.corner_dict), 2))
+        self.corner_points = np.zeros((len(calibrator.corner_dict), 2))
         self.history = collections.deque()
         self.screen = None
         self.tmp_value = 0
@@ -86,8 +89,8 @@ class Eye:
         self.screen = screen
         self.corner_vectors = np.array(self.corner_vectors)
         for i in range(self.corner_vectors.shape[0]):
-            self.point_vectors[i] = screen.get_pixel(self.corner_vectors[i], eye_center)
-        self.translator = calibrator.SeenToScreenTranslator(self.point_vectors)
+            self.corner_points[i] = screen.get_pixel(self.corner_vectors[i], eye_center)
+        self.translator = calibrator.SeenToScreenTranslator(self.corner_points)
         self.translator = self.translator
 
     def add_screen(self, screen):
@@ -98,7 +101,7 @@ class Eye:
         vector = predictor.normalize(vector)
         self.tmp_value += 1
         if self.tmp_value >= 10 and SHOW_EYE_HISTORY_AND_BOARDERS:
-            plt.plot(self.point_vectors[:, 0], self.point_vectors[:, 1], )
+            plt.plot(self.corner_points[:, 0], self.corner_points[:, 1], )
             np_history = np.array(self.history)
             plt.plot(np_history[:, 0], np_history[:, 1], )
             plt.show()
@@ -126,12 +129,25 @@ def get_pixel(tens, a, b, c, d,
 
 
 class Screen:
-    def __init__(self, l_eye=None, r_eye=None):
-        # TODO proper screen coords creation
-        self.a = 0
-        self.b = 0
-        self.c = 1
-        self.d = -1000
+    def __init__(self, l_eye: Eye, r_eye: Eye, solver, head_rotation, head_translation):
+        # TODO non-dumb screen surface creation
+        assert len(l_eye.corner_points) == 5
+        assert len(r_eye.corner_points) == 5
+        self.solver = solver
+        pairs_list = []
+        world_to_camera = vector_to_camera_coordinate_system(head_rotation, head_translation)
+        left_eye = solver.model_points_68[36] + solver.model_points_68[39]
+        left_eye /= 2
+        left_eye = np.array([*left_eye, 1])
+        left_eye = np.matmul(world_to_camera, left_eye)
+        right_eye = solver.model_points_68[42] + solver.model_points_68[45]
+        right_eye /= 2
+        right_eye = np.array([*right_eye, 1])
+        right_eye = np.matmul(world_to_camera, right_eye)
+        for i in range(len(l_eye.corner_vectors)):
+            pair = {'left': [left_eye, l_eye.corner_vectors[i]], 'right': [right_eye, r_eye.corner_vectors[i]]}
+            pairs_list.append(pair)
+        self.a, self.b, self.c, self.d = plane_by_eye_vectors.get_plane_by_eye_vectors(pairs_list)
         self.width = 0.54
         self.heigth = 0.30375
         self.pixel_width = 1920
@@ -149,6 +165,8 @@ class Screen:
         t = - (a * x0 + b * y0 + c * z0 + d) / (a * xv + b * yv + c * zv)
         x = t * xv + x0
         y = t * yv + y0
+        z = t * zv + z0
+
         pixel_x = x
         pixel_y = y
         return [pixel_x, pixel_y]

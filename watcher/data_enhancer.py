@@ -5,7 +5,6 @@ from math import sqrt
 import numpy as np
 import camera_holders
 from PIL import Image, ImageDraw, ImageFont
-import head_tracker
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 from predictor import normalize
 import cv2
