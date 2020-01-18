@@ -10,7 +10,7 @@ import os
 from mpl_toolkits.mplot3d import Axes3D
 import scipy
 
-from predictor import normalize
+from predictor_module import normalize
 
 
 

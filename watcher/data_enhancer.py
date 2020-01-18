@@ -6,7 +6,7 @@ import numpy as np
 import camera_holders
 from PIL import Image, ImageDraw, ImageFont
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
-from predictor import normalize
+from predictor_module import normalize
 import cv2
 
 class AbsDataEnhancer:

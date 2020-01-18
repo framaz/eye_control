@@ -9,7 +9,7 @@ import camera_holders
 from PIL import Image
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 import eye_module
-import predictor
+import predictor_module
 
 FIRST_SMOOTH_TIME = 1
 SECOND_SMOOTH_TIME = 3
@@ -106,7 +106,7 @@ class Calibrator:
         self.left_eye = camera_holders.Eye(eye_type='l')
         self.right_eye = camera_holders.Eye(eye_type='r')
 
-    def calibrate_remember(self, img, time_now):
+    def calibrate_remember(self, img, time_now, predictor):
         result = predictor.predict_eye_vector_and_face_points(img, time_now)
         self.last_time = time_now
         if not (result is None):

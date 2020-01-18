@@ -5,7 +5,7 @@ import scipy
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from predictor import normalize
+from predictor_module import normalize
 
 
 def get_normal_vector(vector0, vector1):

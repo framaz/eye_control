@@ -5,7 +5,7 @@ import cv2
 import PIL
 import calibrator
 import plane_by_eye_vectors
-import predictor
+import predictor_module
 import numpy as np
 import matplotlib.pyplot as plt
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
@@ -36,9 +36,9 @@ class CameraHolder:
     def configure(self):
         pass
 
-    def calibration_tick(self, time_now):
+    def calibration_tick(self, time_now, predictor):
         img = [self.get_picture()]
-        return self.calibrator.calibrate_remember(img, time_now)
+        return self.calibrator.calibrate_remember(img, time_now, predictor)
 
     def calibration_corner_end(self, corner):
         self.calibrator.calibration_end(corner)
@@ -98,7 +98,7 @@ class Eye:
 
     def add_history(self, vector, time_now, eye_center):
         # TODO normal eye center detection
-        vector = predictor.normalize(vector)
+        vector = predictor_module.normalize(vector)
         self.tmp_value += 1
         if self.tmp_value >= 10 and SHOW_EYE_HISTORY_AND_BOARDERS:
             plt.plot(self.corner_points[:, 0], self.corner_points[:, 1], )
