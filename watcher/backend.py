@@ -66,6 +66,7 @@ class BackendForDebugPredictor:
         # 3d part
 
         ax = fig.add_subplot(2, 1, 1, projection='3d')
+
         ax.scatter(self.eyes[:, 0], self.eyes[:, 1],
                    self.eyes[:, 2])
         self._draw_plane(ax)
@@ -82,9 +83,17 @@ class BackendForDebugPredictor:
             ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], color="#ff0000")
 
         # 2d part
-        
 
         ax = fig.add_subplot(2, 1, 2)
+        arr = np.array(self.corner_points).reshape((-1, 3))
+        ax.scatter(arr[:, 0], arr[:, 2], color="#880000")
+        view = self._get_plane_line_point(self.eye_right, np.array([x, 1., z]))
+        ax.scatter(view[0], view[2], color="#00ff00")
+        arr = np.array(self.corner_points).reshape((-1, 3))
+        if arr.shape[0] >= 5:
+            arr[4] = arr[0]
+            ax.plot(arr[:, 0], arr[:, 2], color="#ff0000")
+
         # plt to img
 
         image = fig2img(fig)
