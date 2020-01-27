@@ -1,9 +1,10 @@
 import copy
 from math import sqrt
-import numpy as np
-import scipy
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+import scipy
 
 from predictor_module import normalize
 
@@ -110,7 +111,7 @@ def draw_plot(plane, axis, min_x=-200, min_y=-200, max_x=205, max_y=205):
     a, b, c, d = plane
     xx, yy = np.meshgrid(range(min_x, max_x+5, max_x-min_x), range(min_y, max_y+5, max_y-min_y))
     z = -(a * xx + b * yy + d) / c
-    axis.plot_surface(xx, yy, z)
+    axis.plot_wireframe(xx, yy, z)
 
 
 def kek(points):
@@ -151,10 +152,10 @@ def get_plane_by_eye_vectors(screen_points):
     for screen_point, color in zip(screen_points, colors):
         z.append(get_point_between_lines(*screen_point['left'], *screen_point['right']))
         arr = np.array(screen_point['left'])
-        arr[1] = arr[1] * 1000 + arr[0]
+        arr[1] = arr[1] * 100 + arr[0]
         ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], c=color)
         arr = np.array(screen_point['right'])
-        arr[1] = arr[1] * 1000 + arr[0]
+        arr[1] = arr[1] * 100 + arr[0]
         ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], c=color)
     z = np.array(z)
     ax.scatter(z[:, 0], z[:, 1], z[:, 2])
@@ -164,6 +165,9 @@ def get_plane_by_eye_vectors(screen_points):
     res3 = kek(z)
     val1 = function(res1, z)
     val2 = function(res2, z)
+    if np.isnan(val2):
+        val2 = 100000000
+
     val3 = function(res3, z)
     res = np.array([res1, res2, res3])[np.argmin([val1, val2, val3])]
     draw_plot(res, ax)

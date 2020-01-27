@@ -1,20 +1,19 @@
-from functools import partial
 import collections
+import copy
+import time
+from functools import partial
 from math import sqrt
 
 import dlib
 import numpy as np
 import tensorflow as tf
 from PIL import Image, ImageDraw
-import time
+
 import calibrator
 import eye_module
-import copy
-import model as model_gen
-import image_translation
-import camera_holders
-import matplotlib.pyplot as plt
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
+import image_translation
+import model as model_gen
 
 
 class GoodPredictor:

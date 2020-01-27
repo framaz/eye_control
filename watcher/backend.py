@@ -1,11 +1,13 @@
-import zerorpc
-import numpy
-from PIL import Image
-from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
 import base64
 from io import BytesIO
+
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import numpy
+import numpy as np
+import zerorpc
+from PIL import Image
+
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 
 
@@ -50,17 +52,21 @@ class BackendForDebugPredictor:
         self.solver = pnp_solver.PoseEstimator()
         self.eye_right = sum(self.solver.model_points_68[36:41]) / 6
         self.eye_left = sum(self.solver.model_points_68[42:47]) / 6
-        self.eye_right[:1] *= -1
-        self.eye_left[:1] *= -1
+        self.eye_right[:1] *= 1
+        self.eye_left[:1] *= 1
         self.eyes = np.array([self.eye_right, self.eye_left])
         self.plane = np.array([0., 1., 0., -100.])
         self.corner_points = []
 
-    # API -----------------------------
+    # API electron-server-----------------------------
 
     def request(self, x, z):
         x, z = int(x) / 100, int(z) / 100
-        print(x)
+        left_eye_vector = self.get_left_eye_vector(np.array([x, 1., z]))
+
+        eyes = f'{{"x_right": {x}, "z_right": {z}, "x_left": {left_eye_vector[0]}, "z_left": {left_eye_vector[2]}}}'
+        json_request = f'{{"type": "gaze_vector_change", "value": {eyes}}}'
+        print(json_request)
         fig = plt.figure(figsize=plt.figaspect(2.))
 
         # 3d part
@@ -108,7 +114,9 @@ class BackendForDebugPredictor:
         self.corner_points.append(self._get_plane_line_point(self.eye_right, self.corner_vectors[-1]))
         return "kek"
 
-    # Inner ----------------------------
+    # API watcher-server -----------
+
+    # Non-api ----------------------------
 
     def _draw_vector_from_right_eye(self, plt_axis, vect, color="#880000", point_needed=False):
         vect = np.array(vect)
@@ -129,6 +137,12 @@ class BackendForDebugPredictor:
     def _get_plane_line_point(self, point, vector):
         t = - np.matmul([*point, 1], self.plane) / np.matmul(vector, self.plane[0:3])
         return point + (vector * t)
+
+    def get_left_eye_vector(self, left_eye_vector):
+        point = self._get_plane_line_point(self.eye_right, left_eye_vector)
+        res = point - self.eye_left
+        res /= res[1]
+        return res
 
 
 if __name__ == "__main__":

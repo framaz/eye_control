@@ -136,12 +136,10 @@ class Screen:
         self.solver = solver
         pairs_list = []
         world_to_camera = vector_to_camera_coordinate_system(head_rotation, head_translation)
-        left_eye = solver.model_points_68[36] + solver.model_points_68[39]
-        left_eye /= 2
+        left_eye = sum(self.solver.model_points_68[36:41]) / 6
+        right_eye = sum(self.solver.model_points_68[42:47]) / 6
         left_eye = np.array([*left_eye, 1])
         left_eye = np.matmul(world_to_camera, left_eye)
-        right_eye = solver.model_points_68[42] + solver.model_points_68[45]
-        right_eye /= 2
         right_eye = np.array([*right_eye, 1])
         right_eye = np.matmul(world_to_camera, right_eye)
         for i in range(len(l_eye.corner_vectors)):

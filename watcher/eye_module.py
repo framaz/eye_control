@@ -2,6 +2,8 @@ import numpy as np
 from PIL import Image
 
 eye_padding_ratio = 1.2
+
+
 def slice_eye(img, parts):
     left = min(parts[:, 0])
     top = min(parts[:, 1])
@@ -47,7 +49,10 @@ def find_eye_middle(nparray):
     vect = np.array([1, k])
     return vect, np.array([mid_x, mid_y])
 
+
 PADDING = 10
+
+
 def process_eye(face, np_points):
     eye, left, top = slice_eye(np.array(face), np_points)
     eye = Image.fromarray(eye)

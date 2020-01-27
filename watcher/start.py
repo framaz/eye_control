@@ -1,25 +1,18 @@
-import asyncio
 import time
 import tkinter as tk
-import os
-import dlib
-import numpy as np
-from PIL import ImageTk, Image, ImageDraw
-from cv2 import VideoCapture
+
 import cv2
-import calibrator
 import pyautogui
-import drawer
-import eye_module
-import predictor_module
-import operator
+from cv2 import VideoCapture
+
+import calibrator
 import camera_holders
 import data_enhancer
-from functools import partial
+import drawer
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
-from predictor_module import pixel_func, detect_face_points_dlib, model
-from calibrator import rotate, smooth_n_cut
 
+
+DEBUG_PREDICTOR = True
 NO_CALIB_DEBUG = False
 cycling_flag = True
 
@@ -40,7 +33,15 @@ cam = camera_holders.CameraHolder(cam)
 cameras = list()
 cameras.append(cam)
 solver = pnp_solver.PoseEstimator((1080, 1920))
-predict_obj = predictor_module.GoodPredictor()
+
+if DEBUG_PREDICTOR:
+    import test
+    predictor_obj = test.DebugPredictor()
+else:
+    import predictor_module
+    predictor_obj = predictor_module.GoodPredictor()
+
+
 if not NO_CALIB_DEBUG:
     cycling_flag = True
     while cycling_flag:
@@ -56,10 +57,10 @@ if not NO_CALIB_DEBUG:
                 enhancer = data_enhancer.HeadNEyeDataEnhancer()
 
                 [faces], [eye_one_vectors], [eye_two_vectors], [
-                    np_points], _ = predict_obj.predict_eye_vector_and_face_points([img], time.time(), )
+                    np_points], _ = predictor_obj.predict_eye_vector_and_face_points([img], time.time())
 
-                pic, output = enhancer.process(faces, np_points, eye_one_vectors, eye_two_vectors)
-                app.draw_image(pic, max_size="large")
+                #pic, output = enhancer.process(faces, np_points, eye_one_vectors, eye_two_vectors)
+                app.draw_image(faces, max_size="large")
 
                 # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
             except:
@@ -77,7 +78,7 @@ if not NO_CALIB_DEBUG:
             for camera in cameras:
                 try:
                     cur_time = time.time()
-                    app.draw_eye(None, camera.calibration_tick(cur_time,  predict_obj))
+                    app.draw_eye(None, camera.calibration_tick(cur_time, predictor_obj))
                     last_time = cur_time
                     # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
                 except:
@@ -91,7 +92,7 @@ if not NO_CALIB_DEBUG:
 while True:
     time_now = time.time()
     try:
-        face, results, out_inform = predict_obj.predict(cameras, time_now)
+        face, results, out_inform = predictor_obj.predict(cameras, time_now)
 
         app.draw_image(face)
 
