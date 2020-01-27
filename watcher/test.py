@@ -1,40 +1,26 @@
-import copy
-from math import sqrt, cos, sin
-from random import randint, random, uniform
-import random
-
-import matplotlib.pyplot as plt
+import functools
 import numpy as np
 # import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 import os
-from mpl_toolkits.mplot3d import Axes3D
-import scipy
-
-from predictor_module import normalize
-
+import threading
+import zerorpc
+import subprocess
 
 
+class DebugState:
+    pass
 
+class DebugPredictor:
+    def __init__(self):
+        backend = subprocess.Popen(["python", "backend.py"], stdout=subprocess.PIPE)
+        frontend = subprocess.Popen(["./frontend/node_modules/.bin/electron", "./frontend"])
+        while True:
+            print(backend.stdout.readline())
+
+    def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
+        return [imgs], [np.zeros((3,))], [np.zeros((3,))], [np.zeros((68, 2))], {}
 
 if __name__ == "__main__":
-    # TODO TEST AND IMPLEMENT
-    result = [0, 0, 0]
-    for i in range(1000):
-        x, y = np.meshgrid(range(-20, 21, 10)), np.meshgrid(range(-20, 21, 10))
-        kx, ky = random.uniform(-1000, 1000), random.uniform(-1000, 1000)
-        z = []
-        z_level = random.uniform(-1000, 1000)
-        for a in x[0]:
-            for b in y[0]:
-                z.append([a, b, kx*a+ky*b+np.random.normal(0, 10) - z_level])
-        z = np.array(z)
+    DebugPredictor()
 
-    print(result)
 
-    """for i in range(100):
-        x = [[1, 0, 1], [1, 1, 0], [0, 1, 3], [0, 1, 0]]
-        to_random_coord_translator = rvs(dim=3)
-        for i in range(4):
-            x[i] = np.matmul(to_random_coord_translator, x[i])
-        from_random = np.linalg.inv(to_random_coord_translator)
-        res = np.matmul(from_random, get_point_between_lines(*x))"""

@@ -94,6 +94,8 @@ class GoodPredictor:
         return faces, results, tmp_out_informs
 
 
+
+
 def detect_face_points_dlib(src, cropping_needed=True):
     img = copy.deepcopy(src)
     cur_time = time.time()
