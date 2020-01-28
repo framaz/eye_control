@@ -9,6 +9,7 @@ import predictor_module
 import numpy as np
 import matplotlib.pyplot as plt
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
+import seen_to_screen
 
 SHOW_EYE_HISTORY_AND_BOARDERS = False
 
@@ -55,12 +56,10 @@ class CameraHolder:
     def update_gazes_history(self, eye_one_vector, eye_two_vector, np_points, time_now):
         head_rotation, head_translation = self.head.add_history(np_points, time_now)
         world_to_camera = vector_to_camera_coordinate_system(head_rotation, head_translation)
-        left_eye = self.head.solver.model_points_68[36] + self.head.solver.model_points_68[39]
-        left_eye /= 2
+        left_eye = sum(self.solver.model_points_68[36:41]) / 6
+        right_eye = sum(self.solver.model_points_68[42:47]) / 6
         left_eye = np.array([*left_eye, 1])
         left_eye = np.matmul(world_to_camera, left_eye)
-        right_eye = self.head.solver.model_points_68[42] + self.head.solver.model_points_68[45]
-        right_eye /= 2
         right_eye = np.array([*right_eye, 1])
         right_eye = np.matmul(world_to_camera, right_eye)
         eye_one_screen = self.l_eye.add_history(eye_one_vector, time_now, left_eye)
@@ -90,7 +89,7 @@ class Eye:
         self.corner_vectors = np.array(self.corner_vectors)
         for i in range(self.corner_vectors.shape[0]):
             self.corner_points[i] = screen.get_pixel(self.corner_vectors[i], eye_center)
-        self.translator = calibrator.SeenToScreenTranslator(self.corner_points)
+        self.translator = seen_to_screen.SeenToScreenTranslator(self.corner_points)
         self.translator = self.translator
 
     def add_screen(self, screen):

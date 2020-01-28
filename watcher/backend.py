@@ -7,7 +7,7 @@ import numpy
 import numpy as np
 import zerorpc
 from PIL import Image
-
+import seen_to_screen
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 
 
@@ -57,6 +57,9 @@ class BackendForDebugPredictor:
         self.eyes = np.array([self.eye_right, self.eye_left])
         self.plane = np.array([0., 1., 0., -100.])
         self.corner_points = []
+        self.view_vector = np.array([0., 1., 0.])
+        self.to_predict_status = False
+        self.mouse_coords = np.array([0, 0, 0])
 
     # API electron-server-----------------------------
 
@@ -67,30 +70,31 @@ class BackendForDebugPredictor:
         eyes = f'{{"x_right": {x}, "z_right": {z}, "x_left": {left_eye_vector[0]}, "z_left": {left_eye_vector[2]}}}'
         json_request = f'{{"type": "gaze_vector_change", "value": {eyes}}}'
         print(json_request)
-        fig = plt.figure(figsize=plt.figaspect(2.))
+        self.view_vector = np.array([x, 1., z])
+        img_str = self.get_plot_pic(x, z)
+        return img_str
+
+    def get_plot_pic(self, x, z):
+        fig = plt.figure()
 
         # 3d part
 
-        ax = fig.add_subplot(2, 1, 1, projection='3d')
-
+        ax = fig.add_subplot(2, 2, 1, projection='3d')
         ax.scatter(self.eyes[:, 0], self.eyes[:, 1],
                    self.eyes[:, 2])
         self._draw_plane(ax)
-
         if self.draw_corner_vectors:
             for vect in self.corner_vectors:
                 self._draw_vector_from_right_eye(ax, vect, point_needed=True)
-
         self._draw_vector_from_right_eye(ax, np.array([x, 1, z]), color="#00ff00", point_needed=True)
-
         arr = np.array(self.corner_points).reshape((-1, 3))
         if arr.shape[0] >= 5:
             arr[4] = arr[0]
             ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], color="#ff0000")
 
-        # 2d part
+        # 2d projections
 
-        ax = fig.add_subplot(2, 1, 2)
+        ax = fig.add_subplot(2, 2, 2)
         arr = np.array(self.corner_points).reshape((-1, 3))
         ax.scatter(arr[:, 0], arr[:, 2], color="#880000")
         view = self._get_plane_line_point(self.eye_right, np.array([x, 1., z]))
@@ -100,6 +104,16 @@ class BackendForDebugPredictor:
             arr[4] = arr[0]
             ax.plot(arr[:, 0], arr[:, 2], color="#ff0000")
 
+        # 2d screen
+
+        ax = fig.add_subplot(2, 2, 3)
+        points = np.array(seen_to_screen.points_in_square) * [1920, 1080]
+        points = points.transpose()
+        ax.scatter(*points)
+        points[:,-1] = points[:,0]
+        ax.plot(*points)
+        if self.to_predict_status:
+            ax.scatter(*self.mouse_coords)
         # plt to img
 
         image = fig2img(fig)
@@ -117,6 +131,10 @@ class BackendForDebugPredictor:
         return "kek"
 
     # API watcher-server -----------
+
+    def set_mouse_position(self, x, y):
+        self.mouse_coords = np.array([x, y])
+        self.to_predict_status = True
 
     # Non-api ----------------------------
 

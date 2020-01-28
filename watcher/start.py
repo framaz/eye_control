@@ -53,7 +53,7 @@ if not NO_CALIB_DEBUG:
                     np_points], _ = predictor_obj.predict_eye_vector_and_face_points([img], time.time())
 
                 #pic, output = enhancer.process(faces, np_points, eye_one_vectors, eye_two_vectors)
-                app.draw_image(faces, max_size="large")
+                app.draw_image(faces, max_size="small")
 
                 # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
             except:
@@ -85,34 +85,7 @@ if not NO_CALIB_DEBUG:
 while True:
     time_now = time.time()
     try:
-        face, results, out_inform = predictor_obj.predict(cameras, time_now)
-
-        app.draw_image(face)
-
-        if not NO_CALIB_DEBUG:
-            # out_inform["rotator"] -= angle
-            # out_inform["cutter"] -= offset
-            print(str(out_inform))
-            app.draw_eye(None, str(results))
-            result = list(results)
-            results = [0, 0]
-            for cam in result:
-                for eye in cam:
-                    results[0] += eye[0]
-                    results[1] += eye[1]
-            results[0] /= len(result) * 2
-            results[1] /= len(result) * 2
-            if results[0] < 0:
-                results[0] = 0
-            if results[1] < 0:
-                results[1] = 0
-            if results[0] >= 1920:
-                results[0] = 1919
-            if results[1] >= 1080:
-                results[1] = 1079
-            pyautogui.moveTo(results[0], results[1])
-        else:
-            app.draw_eye(None, str(results))
+        predictor_obj.get_mouse_coords(cameras, time_now)
     except Exception as e:
         e = e
     #   app.draw_image(face)
