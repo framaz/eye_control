@@ -5,6 +5,7 @@ import subprocess
 import threading
 import zerorpc
 import numpy as np
+import drawer
 
 
 def thread_func(debug_predictor, backend_server):
@@ -14,7 +15,11 @@ def thread_func(debug_predictor, backend_server):
         try:
             json_dict = json.loads(line)
             debug_predictor.kek = json_dict
-            if(json_dict["type"] == "gaze_vector_change"):
+
+            if json_dict["type"] == "new_corner":
+                drawer.button_callback()
+
+            if json_dict["type"] == "gaze_vector_change":
                 x = json_dict["value"]["x_right"]
                 z = json_dict["value"]["z_right"]
                 debug_predictor.right_eye_gaze = np.array([x, 1., z])
@@ -23,6 +28,7 @@ def thread_func(debug_predictor, backend_server):
                 debug_predictor.left_eye_gaze = np.array([x, 1., z])
         except json.decoder.JSONDecodeError:
             pass
+
 
 class DebugPredictor:
     def __init__(self):
@@ -40,10 +46,9 @@ class DebugPredictor:
     def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
         return [imgs], [self.right_eye_gaze], [self.left_eye_gaze], [np.zeros((68, 3))], {}
 
+
 if __name__ == "__main__":
     pred = DebugPredictor()
     while True:
         print(pred.gaze_vector)
         pass
-
-

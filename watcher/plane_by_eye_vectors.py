@@ -171,5 +171,5 @@ def get_plane_by_eye_vectors(screen_points):
     val3 = function(res3, z)
     res = np.array([res1, res2, res3])[np.argmin([val1, val2, val3])]
     draw_plot(res, ax)
-    plt.show()
+    #plt.show()
     return res

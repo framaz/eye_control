@@ -112,6 +112,8 @@ class BackendForDebugPredictor:
         x, z = int(x), int(z)
         self.corner_vectors.append(np.array([x / 100, 1, z / 100]))
         self.corner_points.append(self._get_plane_line_point(self.eye_right, self.corner_vectors[-1]))
+        json_request = f'{{"type": "new_corner"}}'
+        print(json_request)
         return "kek"
 
     # API watcher-server -----------

@@ -52,3 +52,10 @@ class App:
         # self.panel_eye.pack(side="top", fill="both", expand="no")
         self.window.update_idletasks()
         self.window.update()
+
+cycling_flag = True
+
+def button_callback():
+    global cycling_flag
+    cycling_flag = False
+    print("azazaza")

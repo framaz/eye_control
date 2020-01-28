@@ -10,20 +10,13 @@ import camera_holders
 import data_enhancer
 import drawer
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
-
+import drawer
 
 DEBUG_PREDICTOR = True
 NO_CALIB_DEBUG = False
-cycling_flag = True
 
 
-def button_callback():
-    global cycling_flag
-    cycling_flag = False
-    print("azazaza")
-
-
-app = drawer.App(tk.Tk(), "Tkinter and OpenCV", button_callback)
+app = drawer.App(tk.Tk(), "Tkinter and OpenCV", drawer.button_callback)
 # Create a window and pass it to the Application object
 
 cam = VideoCapture(0)
@@ -43,8 +36,8 @@ else:
 
 
 if not NO_CALIB_DEBUG:
-    cycling_flag = True
-    while cycling_flag:
+    drawer.cycling_flag = True
+    while drawer.cycling_flag:
         for camera in cameras:
             img = camera.get_picture()
             # img = img.resize((500, 500))
@@ -70,10 +63,10 @@ if not NO_CALIB_DEBUG:
     angle = 0
 
     for corner in calibrator.corner_dict:
-        cycling_flag = True
+        drawer.cycling_flag = True
         app.change_corner(corner)
         last_time = time.time()
-        while cycling_flag:
+        while drawer.cycling_flag:
             time_now = time.time()
             for camera in cameras:
                 try:
