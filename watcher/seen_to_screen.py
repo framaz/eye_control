@@ -63,6 +63,7 @@ def create_basis_translation_matrixes(triangles, inv=True):
             try:
                 translator_matrix = np.linalg.inv(translator_matrix)
             except np.linalg.LinAlgError:
+
                 raise
         translations.append(translator_matrix)
     return translations

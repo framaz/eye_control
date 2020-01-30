@@ -1,4 +1,5 @@
 import base64
+import time
 from io import BytesIO
 
 import matplotlib.pyplot as plt
@@ -75,6 +76,7 @@ class BackendForDebugPredictor:
         return img_str
 
     def get_plot_pic(self, x, z):
+        plt.close('all')
         fig = plt.figure()
 
         # 3d part

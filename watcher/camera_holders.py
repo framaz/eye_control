@@ -62,9 +62,8 @@ class CameraHolder:
         left_eye = np.matmul(world_to_camera, left_eye)
         right_eye = np.array([*right_eye, 1])
         right_eye = np.matmul(world_to_camera, right_eye)
-        eye_one_screen = self.l_eye.add_history(eye_one_vector, time_now, left_eye)
-        eye_two_screen = self.r_eye.add_history(eye_two_vector, time_now, right_eye)
-
+        eye_one_screen = self.l_eye.add_history(eye_one_vector, time_now, right_eye)
+        eye_two_screen = self.r_eye.add_history(eye_two_vector, time_now, left_eye)
         return eye_one_screen, eye_two_screen
 
     def vector_to_seen(self, eye_vector, eye_point=None):
@@ -165,7 +164,7 @@ class Screen:
         z = t * zv + z0
 
         pixel_x = x
-        pixel_y = y
+        pixel_y = z
         return [pixel_x, pixel_y]
 
 

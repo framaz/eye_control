@@ -112,14 +112,14 @@ class Calibrator:
         head = camera_holders.Head(rotation, translation, self.solver)
         screen = camera_holders.Screen(self.left_eye, self.right_eye, self.solver, rotation, translation)
         world_to_camera = camera_holders.vector_to_camera_coordinate_system(rotation, translation)
-        left_eye = head.solver.model_points_68[36] + head.solver.model_points_68[39]
+        left_eye = sum(self.solver.model_points_68[36:41]) / 6
+        right_eye = sum(self.solver.model_points_68[42:47]) / 6
         left_eye = np.array([*left_eye, 1])
         left_eye = np.matmul(world_to_camera, left_eye)
-        right_eye = head.solver.model_points_68[42] + head.solver.model_points_68[45]
         right_eye = np.array([*right_eye, 1])
         right_eye = np.matmul(world_to_camera, right_eye)
-        self.left_eye.create_translator(screen, left_eye)
-        self.right_eye.create_translator(screen, right_eye)
+        self.left_eye.create_translator(screen, right_eye)
+        self.right_eye.create_translator(screen, left_eye)
         return self.left_eye, self.right_eye, head
 
 

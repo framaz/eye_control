@@ -42,3 +42,4 @@ button_func = () => {
 corner_button.addEventListener('click', button_func)
 x_coord.addEventListener('change', func);
 y_coord.addEventListener('change', func);
+let timerId = setInterval(func, 3000)

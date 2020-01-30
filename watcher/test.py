@@ -31,6 +31,8 @@ def thread_func(debug_predictor, backend_server):
                 debug_predictor.left_eye_gaze = np.array([x, 1., z])
         except json.decoder.JSONDecodeError:
             pass
+        except TypeError:
+            k = 3
 
 
 class DebugPredictor(predictor_module.BasicPredictor):
@@ -43,7 +45,7 @@ class DebugPredictor(predictor_module.BasicPredictor):
         self.plane = np.array([0., 1., 0., -100.])
         thread = threading.Thread(target=thread_func, args=(self, self.backend))
         thread.start()
-        self.solver = pnp_solver.PoseEstimator()
+        self.solver = pnp_solver.PoseEstimator((1080, 1920))
         self.client = zerorpc.Client()
         self.client.connect("tcp://127.0.0.1:4242")
 
@@ -67,14 +69,6 @@ class DebugPredictor(predictor_module.BasicPredictor):
                 results[1] += eye[1]
         results[0] /= len(result) * 2
         results[1] /= len(result) * 2
-        if results[0] < 0:
-            results[0] = 0
-        if results[1] < 0:
-            results[1] = 0
-        if results[0] >= 1920:
-            results[0] = 1919
-        if results[1] >= 1080:
-            results[1] = 1079
         self.client.set_mouse_position(*results)
 
 
