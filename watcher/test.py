@@ -18,10 +18,8 @@ def thread_func(debug_predictor, backend_server):
         try:
             json_dict = json.loads(line)
             debug_predictor.kek = json_dict
-
             if json_dict["type"] == "new_corner":
                 drawer.button_callback()
-
             if json_dict["type"] == "gaze_vector_change":
                 x = json_dict["value"]["x_right"]
                 z = json_dict["value"]["z_right"]
@@ -29,6 +27,14 @@ def thread_func(debug_predictor, backend_server):
                 x = json_dict["value"]["x_left"]
                 z = json_dict["value"]["z_left"]
                 debug_predictor.left_eye_gaze = np.array([x, 1., z])
+            if json_dict["type"] == "matrix_change":
+                matrix = json_dict["value"]
+                matrix = np.array(list((map(lambda x: float(x), matrix[1: -1].split(', '))))).reshape((3, 4))
+                debug_predictor.world_to_camera = matrix
+                face_points = []
+                for point in debug_predictor.non_transformed:
+                    face_points.append(np.matmul(matrix, point))
+                debug_predictor.face_points = np.array(face_points)
         except json.decoder.JSONDecodeError:
             pass
         except TypeError:
@@ -48,9 +54,17 @@ class DebugPredictor(predictor_module.BasicPredictor):
         self.solver = pnp_solver.PoseEstimator((1080, 1920))
         self.client = zerorpc.Client()
         self.client.connect("tcp://127.0.0.1:4242")
+        self.world_to_camera = np.zeros((3, 4), dtype=np.float64)
+        self.world_to_camera[0, 0] = 1
+        self.world_to_camera[1, 1] = 1
+        self.world_to_camera[2, 2] = 1
+        self.non_transformed = np.ones((68, 4))
+        self.non_transformed[:, :-1] = np.copy(self.solver.model_points_68)
+        self.non_transformed.transpose()
+        self.face_points = self.solver.model_points_68
 
     def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
-        projections, _ = cv2.projectPoints(self.solver.model_points_68, np.array([0., 0., 0.]), np.array([0., 0., 0.],),
+        projections, _ = cv2.projectPoints(self.face_points, np.array([0., 0., 0.]), np.array([0., 0., 0.],),
                                         self.solver.camera_matrix, self.solver.dist_coeefs)
         projections = projections.reshape((-1, 2))
         return imgs, [self.right_eye_gaze], [self.left_eye_gaze], [projections], {}

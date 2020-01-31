@@ -1,4 +1,5 @@
 import base64
+import math
 import time
 from io import BytesIO
 
@@ -47,20 +48,24 @@ def fig2data(fig: plt.Figure):
 
 
 class BackendForDebugPredictor:
-    def __init__(self, draw_corner_vectors=True):
+    def __init__(self, draw_corner_vectors=False):
         self.draw_corner_vectors = draw_corner_vectors
         self.corner_vectors = []
         self.solver = pnp_solver.PoseEstimator()
         self.eye_right = sum(self.solver.model_points_68[36:41]) / 6
         self.eye_left = sum(self.solver.model_points_68[42:47]) / 6
+        self.eye_right_origin = np.append(self.eye_right, [1])
+        self.eye_left_origin = np.append(self.eye_left, [1])
         self.eye_right[:1] *= 1
         self.eye_left[:1] *= 1
         self.eyes = np.array([self.eye_right, self.eye_left])
-        self.plane = np.array([0, 1., 0.3, -100.])
+        self.plane = np.array([0, 1., 0., -100.])
         self.corner_points = []
         self.view_vector = np.array([0., 1., 0.])
         self.to_predict_status = False
         self.mouse_coords = np.array([0, 0, 0])
+        self.rotation_angles = np.array([0., 0., 0.])
+        self.translation_vector = np.array([0., 0., 0.])
 
     # API electron-server-----------------------------
 
@@ -132,6 +137,10 @@ class BackendForDebugPredictor:
         print(json_request)
         return "kek"
 
+    def head_translation(self, x, y, z):
+        self.translation_vector = np.array([x, y, z], dtype=np.float64)
+        self.recalculate_eyes_position()
+
     # API watcher-server -----------
 
     def set_mouse_position(self, x, y):
@@ -139,6 +148,33 @@ class BackendForDebugPredictor:
         self.to_predict_status = True
 
     # Non-api ----------------------------
+
+    def get_rotation_matrix(self, angles):
+        x_matrix = np.array([[1, 0, 0],
+                        [0, math.cos(angles[0]), -math.sin(angles[0])],
+                        [0, math.sin(angles[0]), math.cos(angles[0])]
+                        ])
+        y_matrix = np.array([[math.cos(angles[1]), 0, math.sin(angles[1])],
+                        [0, 1, 0],
+                        [-math.sin(angles[1]), 0, math.cos(angles[1])]
+                        ])
+        z_matrix = np.array([[math.cos(angles[2]), -math.sin(angles[2]), 0],
+                        [math.sin(angles[2]), math.cos(angles[2]), 0],
+                        [0, 0, 1]
+                        ])
+        return np.matmul(z_matrix, np.matmul(y_matrix, x_matrix))
+
+    def recalculate_eyes_position(self):
+        matrix = np.zeros((3, 4))
+        matrix[:, :3] = self.get_rotation_matrix(self.rotation_angles)
+        matrix[:, 3] = self.translation_vector
+        self.eye_left = np.matmul(matrix, self.eye_left_origin)
+        self.eye_right = np.matmul(matrix, self.eye_right_origin)
+        self.eyes = np.array([self.eye_left, self.eye_right])
+        string = matrix.reshape((-1,))
+        string = list(string)
+        json_request = f'{{"type": "matrix_change", "value": "{string}"}}'
+        print(json_request)
 
     def _draw_vector_from_right_eye(self, plt_axis, vect, color="#880000", point_needed=False):
         vect = np.array(vect)
@@ -148,6 +184,7 @@ class BackendForDebugPredictor:
         plt_axis.plot(tmp[:, 0], tmp[:, 1], tmp[:, 2], color)
         if point_needed:
             plt_axis.scatter(*point, color=color)
+
 
     def _draw_plane(self, axis):
         xx, zz = np.meshgrid(range(-150, 151, 50), range(-150, 151, 50))

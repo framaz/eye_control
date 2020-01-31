@@ -7,12 +7,10 @@
 let states = [0, 1, 2, 3, 4];
 let cur_state = 0;
 
-const result = document.querySelector('#test');
 console.log(require("zerorpc"))
 const zerorpc = require("zerorpc");
 
 let client = new zerorpc.Client();
-result.textContent = "aaa";
 client.connect("tcp://127.0.0.1:4242");
 let pic = document.querySelector('#pic');
 func = () => {
@@ -25,6 +23,18 @@ func = () => {
 client.invoke("request", 1, 1, function(error, res, more) { var asd = 1});
 let x_coord = document.querySelector('#x');
 let y_coord = document.querySelector('#y');
+let x_translation = document.querySelector('#x_translation');
+let y_translation = document.querySelector('#y_translation');
+let z_translation = document.querySelector('#z_translation');
+
+translate_eyes = () => {
+    let x = x_translation.value
+    let y = y_translation.value
+    let z = z_translation.value
+    client.invoke("head_translation", x, y, z, function(error, res, more) {
+    })
+    func()
+}
 
 let corner_button = document.querySelector('#corner_change')
 
@@ -42,4 +52,7 @@ button_func = () => {
 corner_button.addEventListener('click', button_func)
 x_coord.addEventListener('change', func);
 y_coord.addEventListener('change', func);
+x_translation.addEventListener('change', translate_eyes);
+y_translation.addEventListener('change', translate_eyes);
+z_translation.addEventListener('change', translate_eyes);
 let timerId = setInterval(func, 3000)
