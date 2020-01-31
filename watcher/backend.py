@@ -56,7 +56,7 @@ class BackendForDebugPredictor:
         self.eye_right[:1] *= 1
         self.eye_left[:1] *= 1
         self.eyes = np.array([self.eye_right, self.eye_left])
-        self.plane = np.array([0., 1., 0., -100.])
+        self.plane = np.array([0, 1., 0.3, -100.])
         self.corner_points = []
         self.view_vector = np.array([0., 1., 0.])
         self.to_predict_status = False
@@ -152,8 +152,7 @@ class BackendForDebugPredictor:
     def _draw_plane(self, axis):
         xx, zz = np.meshgrid(range(-150, 151, 50), range(-150, 151, 50))
         a, b, c, d = self.plane
-        y = - d / b
-        yy = np.full_like(xx, y)
+        yy = - (d + a*xx + c*zz) / b
         axis.plot_wireframe(xx, yy, zz)
 
     def _get_plane_line_point(self, point, vector):
