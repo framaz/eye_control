@@ -18,7 +18,7 @@ import model as model_gen
 
 
 class BasicPredictor:
-    def predict_eye_vector_and_face_points(selfself, imgs, time_now, configurator=None):
+    def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
         raise NotImplementedError
 
     def get_mouse_coords(self, cameras, time_now):

@@ -26,12 +26,23 @@ let y_coord = document.querySelector('#y');
 let x_translation = document.querySelector('#x_translation');
 let y_translation = document.querySelector('#y_translation');
 let z_translation = document.querySelector('#z_translation');
+let x_rotation = document.querySelector('#x_rotation');
+let y_rotation = document.querySelector('#y_rotation');
+let z_rotation = document.querySelector('#z_rotation');
 
 translate_eyes = () => {
     let x = x_translation.value
     let y = y_translation.value
     let z = z_translation.value
     client.invoke("head_translation", x, y, z, function(error, res, more) {
+    })
+    func()
+}
+rotate_eyes = () => {
+    let x = x_rotation.value
+    let y = y_rotation.value
+    let z = z_rotation.value
+    client.invoke("head_rotation", x, y ,z, function(error, res, more) {
     })
     func()
 }
@@ -55,4 +66,7 @@ y_coord.addEventListener('change', func);
 x_translation.addEventListener('change', translate_eyes);
 y_translation.addEventListener('change', translate_eyes);
 z_translation.addEventListener('change', translate_eyes);
+x_rotation.addEventListener('change', rotate_eyes);
+y_rotation.addEventListener('change', rotate_eyes);
+z_rotation.addEventListener('change', rotate_eyes);
 let timerId = setInterval(func, 3000)

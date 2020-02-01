@@ -35,6 +35,7 @@ def thread_func(debug_predictor, backend_server):
                 for point in debug_predictor.non_transformed:
                     face_points.append(np.matmul(matrix, point))
                 debug_predictor.face_points = np.array(face_points)
+                debug_predictor.rotation_vector, _ = cv2.Rodrigues(matrix[:, :3])
         except json.decoder.JSONDecodeError:
             pass
         except TypeError:
@@ -62,6 +63,7 @@ class DebugPredictor(predictor_module.BasicPredictor):
         self.non_transformed[:, :-1] = np.copy(self.solver.model_points_68)
         self.non_transformed.transpose()
         self.face_points = self.solver.model_points_68
+        self.rotation_vector = np.array([0., 0., 0.])
 
     def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
         projections, _ = cv2.projectPoints(self.face_points, np.array([0., 0., 0.]), np.array([0., 0., 0.],),

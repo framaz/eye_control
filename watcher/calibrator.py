@@ -78,13 +78,9 @@ class Calibrator:
             _, [left_eye_vect], [right_eye_vect], [np_points], _ = result
             left_eye_vect = np.append(left_eye_vect, time_now)
             right_eye_vect = np.append(right_eye_vect, time_now)
-            if isinstance(predictor, GoodPredictor):
-                head_rotation_vect, head_translation_vect = self.solver.solve_pose(np_points)
-                head_rotation_vect = np.append(head_rotation_vect, time_now)
-                head_translation_vect = np.append(head_translation_vect, time_now)
-            else:
-                head_rotation_vect = np.array([0., 0., 0., time_now])
-                head_translation_vect = head_rotation_vect
+            head_rotation_vect, head_translation_vect = self.solver.solve_pose(np_points)
+            head_rotation_vect = np.append(head_rotation_vect, time_now)
+            head_translation_vect = np.append(head_translation_vect, time_now)
             self.calibration_history_left.append(left_eye_vect)
             self.calibration_history_right.append(right_eye_vect)
             self.calibration_history_head_rotation.append(head_rotation_vect)

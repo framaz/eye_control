@@ -48,7 +48,8 @@ def fig2data(fig: plt.Figure):
 
 
 class BackendForDebugPredictor:
-    def __init__(self, draw_corner_vectors=False):
+    def __init__(self, draw_corner_vectors=False, draw_full_face=True):
+        self.draw_full_face = draw_full_face
         self.draw_corner_vectors = draw_corner_vectors
         self.corner_vectors = []
         self.solver = pnp_solver.PoseEstimator()
@@ -66,6 +67,7 @@ class BackendForDebugPredictor:
         self.mouse_coords = np.array([0, 0, 0])
         self.rotation_angles = np.array([0., 0., 0.])
         self.translation_vector = np.array([0., 0., 0.])
+        self.all_points = np.copy(self.solver.model_points_68)
 
     # API electron-server-----------------------------
 
@@ -79,6 +81,31 @@ class BackendForDebugPredictor:
         self.view_vector = np.array([x, 1., z])
         img_str = self.get_plot_pic(x, z)
         return img_str
+
+    def new_corner(self, x, z):
+        x, z = int(x), int(z)
+        self.corner_vectors.append(np.array([x / 100, 1, z / 100]))
+        self.corner_points.append(self._get_plane_line_point(self.eye_right, self.corner_vectors[-1]))
+        json_request = f'{{"type": "new_corner"}}'
+        print(json_request)
+        return "kek"
+
+    def head_translation(self, x, y, z):
+        self.translation_vector = np.array([x, y, z], dtype=np.float64)
+        self.recalculate_eyes_position()
+
+    def head_rotation(self, x, y, z):
+        self.rotation_angles = np.array([x, y, z], dtype=np.float64) / 180 * math.pi
+        self.rotation_angles[0] -= math.pi/2
+        self.recalculate_eyes_position()
+
+    # API watcher-server -----------
+
+    def set_mouse_position(self, x, y):
+        self.mouse_coords = np.array([x, y])
+        self.to_predict_status = True
+
+    # Non-api ----------------------------
 
     def get_plot_pic(self, x, z):
         plt.close('all')
@@ -95,6 +122,8 @@ class BackendForDebugPredictor:
                 self._draw_vector_from_right_eye(ax, vect, point_needed=True)
         self._draw_vector_from_right_eye(ax, np.array([x, 1, z]), color="#00ff00", point_needed=True)
         arr = np.array(self.corner_points).reshape((-1, 3))
+        if self.draw_full_face:
+            ax.scatter(self.all_points[:, 0], self.all_points[:, 1], self.all_points[:, 2])
         if arr.shape[0] >= 5:
             arr[4] = arr[0]
             ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], color="#ff0000")
@@ -117,7 +146,7 @@ class BackendForDebugPredictor:
         points = np.array(seen_to_screen.points_in_square) * [1920, 1080]
         points = points.transpose()
         ax.scatter(*points)
-        points[:,-1] = points[:,0]
+        points[:, -1] = points[:, 0]
         ax.plot(*points)
         if self.to_predict_status:
             ax.scatter(*self.mouse_coords)
@@ -128,26 +157,6 @@ class BackendForDebugPredictor:
         image.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue())
         return img_str
-
-    def new_corner(self, x, z):
-        x, z = int(x), int(z)
-        self.corner_vectors.append(np.array([x / 100, 1, z / 100]))
-        self.corner_points.append(self._get_plane_line_point(self.eye_right, self.corner_vectors[-1]))
-        json_request = f'{{"type": "new_corner"}}'
-        print(json_request)
-        return "kek"
-
-    def head_translation(self, x, y, z):
-        self.translation_vector = np.array([x, y, z], dtype=np.float64)
-        self.recalculate_eyes_position()
-
-    # API watcher-server -----------
-
-    def set_mouse_position(self, x, y):
-        self.mouse_coords = np.array([x, y])
-        self.to_predict_status = True
-
-    # Non-api ----------------------------
 
     def get_rotation_matrix(self, angles):
         x_matrix = np.array([[1, 0, 0],
@@ -168,6 +177,9 @@ class BackendForDebugPredictor:
         matrix = np.zeros((3, 4))
         matrix[:, :3] = self.get_rotation_matrix(self.rotation_angles)
         matrix[:, 3] = self.translation_vector
+        if self.draw_full_face:
+            for i in range(68):
+                self.all_points[i] = np.matmul(matrix, [*(self.solver.model_points_68[i]), 1])
         self.eye_left = np.matmul(matrix, self.eye_left_origin)
         self.eye_right = np.matmul(matrix, self.eye_right_origin)
         self.eyes = np.array([self.eye_left, self.eye_right])
