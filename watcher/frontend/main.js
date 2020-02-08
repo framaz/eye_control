@@ -15,10 +15,16 @@ function createWindow () {
       nodeIntegration: true
     }
   })
-
+  
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
-
+  if(process.argv.length >=3) {
+    if(process.argv[2] == 'camera_calibrator') {
+      mainWindow.loadFile('camera_calibrator.html')
+    }
+  }
+  else {
+    mainWindow.loadFile('index.html')
+  }
   // Open the DevTools.
    mainWindow.webContents.openDevTools()
 
@@ -40,7 +46,14 @@ app.on('ready', createWindow)
 app.on('window-all-closed', function () {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') app.quit()
+  if (process.platform !== 'darwin') {
+    const zerorpc = require("zerorpc");
+    let client = new zerorpc.Client();
+    client.connect("tcp://127.0.0.1:4243");
+    client.invoke("exit", function(error, res, more) {
+        });
+    app.quit()
+  }
 })
 
 app.on('activate', function () {
