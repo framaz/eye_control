@@ -144,6 +144,7 @@ class Screen:
             pair = {'left': [left_eye, l_eye.corner_vectors[i]], 'right': [right_eye, r_eye.corner_vectors[i]]}
             pairs_list.append(pair)
         self.a, self.b, self.c, self.d = plane_by_eye_vectors.get_plane_by_eye_vectors(pairs_list)
+        #self.a, self.b, self.c, self.d = 0, 0, 1, 450
         self.width = 0.54
         self.heigth = 0.30375
         self.pixel_width = 1920
@@ -164,7 +165,7 @@ class Screen:
         z = t * zv + z0
 
         pixel_x = x
-        pixel_y = z
+        pixel_y = y
         return [pixel_x, pixel_y]
 
 

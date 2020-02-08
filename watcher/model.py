@@ -17,7 +17,7 @@ def get_model():
     x = model(inputs)
     y = tf.keras.layers.Flatten()(inputs)
     res = x
-   # res = tf.keras.layers.concatenate([x, y], axis=1)
+    res = tf.keras.layers.concatenate([x, y], axis=1)
     res = tf.keras.layers.Dense(1500, activation="relu")(res)
     res = tf.keras.layers.Dense(3)(res)
     model = tf.keras.Model(inputs, res)

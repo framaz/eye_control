@@ -7,6 +7,7 @@ from PIL import Image
 import camera_holders
 import eye_module
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
+import matplotlib.pyplot as plt
 from predictor_module import GoodPredictor
 from seen_to_screen import SeenToScreenTranslator
 
@@ -116,8 +117,24 @@ class Calibrator:
         right_eye = np.matmul(world_to_camera, right_eye)
         self.left_eye.create_translator(screen, right_eye)
         self.right_eye.create_translator(screen, left_eye)
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1, projection='3d')
+        ax.scatter(*left_eye, color="#ff0000")
+        ax.scatter(*right_eye, color="#00ff00")
+        kek = []
+        for point in self.solver.model_points_68:
+            kek.append(np.matmul(world_to_camera, [*point, 1]))
+        kek = np.array(kek)
+        kek = kek.transpose()
+        ax.scatter(*kek, color="#0000ff")
+        for i in range(5):
+            draw_eyes(ax, left_eye, right_eye, self.left_eye.corner_vectors[i], self.right_eye.corner_vectors[i])
+        #plt.show()
         return self.left_eye, self.right_eye, head
 
+def draw_eyes(ax, left_eye, right_eye, left_vect, right_vect):
+    ax.scatter(*(left_eye + 1000*left_vect), color="#880000")
+    ax.scatter(*(right_eye + 1000*right_vect), color="#008800")
 
 # def create_translator(self):
 #     self.left_eye.create_translator()

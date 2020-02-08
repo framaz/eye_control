@@ -8,7 +8,7 @@ from cv2 import VideoCapture
 import calibrator
 import camera_holders
 import data_enhancer
-import drawer
+import predictor_module
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 import drawer
 
@@ -28,10 +28,8 @@ cameras.append(cam)
 solver = pnp_solver.PoseEstimator((1080, 1920))
 
 if DEBUG_PREDICTOR:
-    import test
-    predictor_obj = test.DebugPredictor()
+    predictor_obj = predictor_module.DebugPredictor()
 else:
-    import predictor_module
     predictor_obj = predictor_module.GoodPredictor()
 
 
@@ -49,11 +47,10 @@ if not NO_CALIB_DEBUG:
 
                 enhancer = data_enhancer.HeadNEyeDataEnhancer()
 
-                [faces], [eye_one_vectors], [eye_two_vectors], [
-                    np_points], _ = predictor_obj.predict_eye_vector_and_face_points([img], time.time())
+                faces, eye_one_vectors, eye_two_vectors, np_points, _ = predictor_obj.predict_eye_vector_and_face_points([img], time.time())
 
                 #pic, output = enhancer.process(faces, np_points, eye_one_vectors, eye_two_vectors)
-                app.draw_image(faces, max_size="small")
+                app.draw_image(faces[0], max_size="small")
 
                 # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
             except:
