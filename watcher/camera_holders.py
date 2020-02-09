@@ -36,53 +36,53 @@ class CameraHolder:
             self.server = None
             self.camera = camera
             self.attributes = {}
-            self.attribute_names =  {
-"CAP_PROP_POS_MSEC": cv2.CAP_PROP_POS_MSEC,
-"CAP_PROP_POS_FRAMES": cv2.CAP_PROP_POS_FRAMES,
-"CAP_PROP_POS_AVI_RATIO": cv2.CAP_PROP_POS_AVI_RATIO,
-"CAP_PROP_FRAME_WIDTH": cv2.CAP_PROP_FRAME_WIDTH,
-"CAP_PROP_FRAME_HEIGHT": cv2.CAP_PROP_FRAME_HEIGHT,
-"CAP_PROP_FPS": cv2.CAP_PROP_FPS,
-"CAP_PROP_FOURCC": cv2.CAP_PROP_FOURCC,
-"CAP_PROP_FRAME_COUNT": cv2.CAP_PROP_FRAME_COUNT,
-"CAP_PROP_FORMAT": cv2.CAP_PROP_FORMAT,
-"CAP_PROP_MODE": cv2.CAP_PROP_MODE,
-"CAP_PROP_BRIGHTNESS": cv2.CAP_PROP_BRIGHTNESS,
-"CAP_PROP_CONTRAST": cv2.CAP_PROP_CONTRAST,
-"CAP_PROP_SATURATION": cv2.CAP_PROP_SATURATION,
-"CAP_PROP_HUE": cv2.CAP_PROP_HUE,
-"CAP_PROP_GAIN": cv2.CAP_PROP_GAIN,
-"CAP_PROP_EXPOSURE": cv2.CAP_PROP_EXPOSURE,
-"CAP_PROP_CONVERT_RGB": cv2.CAP_PROP_CONVERT_RGB,
-"CAP_PROP_WHITE_BALANCE_BLUE_U": cv2.CAP_PROP_WHITE_BALANCE_BLUE_U,
-"CAP_PROP_RECTIFICATION": cv2.CAP_PROP_RECTIFICATION,
-"CAP_PROP_MONOCHROME": cv2.CAP_PROP_MONOCHROME,
-"CAP_PROP_SHARPNESS": cv2.CAP_PROP_SHARPNESS,
-"CAP_PROP_AUTO_EXPOSURE": cv2.CAP_PROP_AUTO_EXPOSURE,
-"CAP_PROP_GAMMA": cv2.CAP_PROP_GAMMA,
-"CAP_PROP_TEMPERATURE": cv2.CAP_PROP_TEMPERATURE,
-"CAP_PROP_TRIGGER": cv2.CAP_PROP_TRIGGER,
-"CAP_PROP_TRIGGER_DELAY": cv2.CAP_PROP_TRIGGER_DELAY,
-"CAP_PROP_WHITE_BALANCE_RED_V": cv2.CAP_PROP_WHITE_BALANCE_RED_V,
-"CAP_PROP_ZOOM": cv2.CAP_PROP_ZOOM,
-"CAP_PROP_FOCUS": cv2.CAP_PROP_FOCUS,
-"CAP_PROP_GUID": cv2.CAP_PROP_GUID,
-"CAP_PROP_ISO_SPEED": cv2.CAP_PROP_ISO_SPEED,
-"CAP_PROP_BACKLIGHT": cv2.CAP_PROP_BACKLIGHT,
-"CAP_PROP_PAN": cv2.CAP_PROP_PAN,
-"CAP_PROP_TILT": cv2.CAP_PROP_TILT,
-"CAP_PROP_ROLL": cv2.CAP_PROP_ROLL,
-"CAP_PROP_IRIS": cv2.CAP_PROP_IRIS,
-"CAP_PROP_SETTINGS": cv2.CAP_PROP_SETTINGS,
-"CAP_PROP_BUFFERSIZE": cv2.CAP_PROP_BUFFERSIZE,
-"CAP_PROP_AUTOFOCUS": cv2.CAP_PROP_AUTOFOCUS,
-"CAP_PROP_SAR_NUM": cv2.CAP_PROP_SAR_NUM,
-"CAP_PROP_SAR_DEN": cv2.CAP_PROP_SAR_DEN,
-"CAP_PROP_BACKEND": cv2.CAP_PROP_BACKEND,
-"CAP_PROP_CHANNEL": cv2.CAP_PROP_CHANNEL,
-"CAP_PROP_AUTO_WB": cv2.CAP_PROP_AUTO_WB,
-"CAP_PROP_WB_TEMPERATURE": cv2.CAP_PROP_WB_TEMPERATURE,
-}
+            self.attribute_names = {
+                "CAP_PROP_POS_MSEC": cv2.CAP_PROP_POS_MSEC,
+                "CAP_PROP_POS_FRAMES": cv2.CAP_PROP_POS_FRAMES,
+                "CAP_PROP_POS_AVI_RATIO": cv2.CAP_PROP_POS_AVI_RATIO,
+                "CAP_PROP_FRAME_WIDTH": cv2.CAP_PROP_FRAME_WIDTH,
+                "CAP_PROP_FRAME_HEIGHT": cv2.CAP_PROP_FRAME_HEIGHT,
+                "CAP_PROP_FPS": cv2.CAP_PROP_FPS,
+                "CAP_PROP_FOURCC": cv2.CAP_PROP_FOURCC,
+                "CAP_PROP_FRAME_COUNT": cv2.CAP_PROP_FRAME_COUNT,
+                "CAP_PROP_FORMAT": cv2.CAP_PROP_FORMAT,
+                "CAP_PROP_MODE": cv2.CAP_PROP_MODE,
+                "CAP_PROP_BRIGHTNESS": cv2.CAP_PROP_BRIGHTNESS,
+                "CAP_PROP_CONTRAST": cv2.CAP_PROP_CONTRAST,
+                "CAP_PROP_SATURATION": cv2.CAP_PROP_SATURATION,
+                "CAP_PROP_HUE": cv2.CAP_PROP_HUE,
+                "CAP_PROP_GAIN": cv2.CAP_PROP_GAIN,
+                "CAP_PROP_EXPOSURE": cv2.CAP_PROP_EXPOSURE,
+                "CAP_PROP_CONVERT_RGB": cv2.CAP_PROP_CONVERT_RGB,
+                "CAP_PROP_WHITE_BALANCE_BLUE_U": cv2.CAP_PROP_WHITE_BALANCE_BLUE_U,
+                "CAP_PROP_RECTIFICATION": cv2.CAP_PROP_RECTIFICATION,
+                "CAP_PROP_MONOCHROME": cv2.CAP_PROP_MONOCHROME,
+                "CAP_PROP_SHARPNESS": cv2.CAP_PROP_SHARPNESS,
+                "CAP_PROP_AUTO_EXPOSURE": cv2.CAP_PROP_AUTO_EXPOSURE,
+                "CAP_PROP_GAMMA": cv2.CAP_PROP_GAMMA,
+                "CAP_PROP_TEMPERATURE": cv2.CAP_PROP_TEMPERATURE,
+                "CAP_PROP_TRIGGER": cv2.CAP_PROP_TRIGGER,
+                "CAP_PROP_TRIGGER_DELAY": cv2.CAP_PROP_TRIGGER_DELAY,
+                "CAP_PROP_WHITE_BALANCE_RED_V": cv2.CAP_PROP_WHITE_BALANCE_RED_V,
+                "CAP_PROP_ZOOM": cv2.CAP_PROP_ZOOM,
+                "CAP_PROP_FOCUS": cv2.CAP_PROP_FOCUS,
+                "CAP_PROP_GUID": cv2.CAP_PROP_GUID,
+                "CAP_PROP_ISO_SPEED": cv2.CAP_PROP_ISO_SPEED,
+                "CAP_PROP_BACKLIGHT": cv2.CAP_PROP_BACKLIGHT,
+                "CAP_PROP_PAN": cv2.CAP_PROP_PAN,
+                "CAP_PROP_TILT": cv2.CAP_PROP_TILT,
+                "CAP_PROP_ROLL": cv2.CAP_PROP_ROLL,
+                "CAP_PROP_IRIS": cv2.CAP_PROP_IRIS,
+                "CAP_PROP_SETTINGS": cv2.CAP_PROP_SETTINGS,
+                "CAP_PROP_BUFFERSIZE": cv2.CAP_PROP_BUFFERSIZE,
+                "CAP_PROP_AUTOFOCUS": cv2.CAP_PROP_AUTOFOCUS,
+                "CAP_PROP_SAR_NUM": cv2.CAP_PROP_SAR_NUM,
+                "CAP_PROP_SAR_DEN": cv2.CAP_PROP_SAR_DEN,
+                "CAP_PROP_BACKEND": cv2.CAP_PROP_BACKEND,
+                "CAP_PROP_CHANNEL": cv2.CAP_PROP_CHANNEL,
+                "CAP_PROP_AUTO_WB": cv2.CAP_PROP_AUTO_WB,
+                "CAP_PROP_WB_TEMPERATURE": cv2.CAP_PROP_WB_TEMPERATURE,
+            }
             for attr_name in self.attribute_names:
                 i = self.attribute_names[attr_name]
                 res = self.camera.get(i)
@@ -108,7 +108,7 @@ class CameraHolder:
         def get_frame(self):
             ret, image = self.camera.read()
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
- #           image = cv2.fastNlMeansDenoising(image.reshape((*(image.shape), 1)))
+            #           image = cv2.fastNlMeansDenoising(image.reshape((*(image.shape), 1)))
             buffered = BytesIO()
             image = Image.fromarray(image)
             image.save(buffered, format="JPEG")
@@ -242,7 +242,7 @@ class Screen:
             pair = {'left': [left_eye, l_eye.corner_vectors[i]], 'right': [right_eye, r_eye.corner_vectors[i]]}
             pairs_list.append(pair)
         self.a, self.b, self.c, self.d = plane_by_eye_vectors.get_plane_by_eye_vectors(pairs_list)
-        #self.a, self.b, self.c, self.d = 0, 0, 1, 450
+        # self.a, self.b, self.c, self.d = 0, 0, 1, 450
         self.width = 0.54
         self.heigth = 0.30375
         self.pixel_width = 1920

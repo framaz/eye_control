@@ -96,18 +96,18 @@ class GoodPredictor(BasicPredictor):
 
                     # face_cutter = calibrator.FaceCropper(np_points)
                     # face, np_points = face_cutter.apply_forth(img)
-                    rotator = calibrator.RotationTranslation(np_points)
-                    face, np_points = rotator.apply_forth(img)
+                   # rotator = calibrator.RotationTranslation(np_points)
+                    #face, np_points = rotator.apply_forth(img)
                     to_out_face = face
                     # tmp_out_inform["cutter"] = face_cutter.get_modification_data()
                     # tmp_out_inform["rotator"] = rotator.get_modification_data()
                     eyes = []
 
-                    eyes.append(eye_module.process_eye(face, np_points[36:42]))
-                    eyes.append(eye_module.process_eye(face, np_points[42:48]))
+                    eyes.append(eye_module.process_eye(face, np_points))
                     eyes_to_predict = []
-                    for eye, _, _ in eyes:
-                        eyes_to_predict.append(eye)
+                    for eye_one, eye_two in eyes:
+                        eyes_to_predict.append(eye_one)
+                        eyes_to_predict.append(eye_two)
                     res = model.predict(np.array(eyes_to_predict))
                     eye_one_vector = normalize(res[0])
                     eye_two_vector = normalize(res[1])

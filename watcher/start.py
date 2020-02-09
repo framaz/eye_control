@@ -12,7 +12,7 @@ import predictor_module
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 import drawer
 
-DEBUG_PREDICTOR = True
+DEBUG_PREDICTOR = False
 NO_CALIB_DEBUG = False
 
 
@@ -45,12 +45,12 @@ if not NO_CALIB_DEBUG:
                 # enhancer = data_enhancer.HeadPositionAxisDataEnhancer()
                 # pic, output = enhancer.process(face, np_points)
 
-                enhancer = data_enhancer.HeadNEyeDataEnhancer()
+                enhancer = data_enhancer.HeadNEyeDataEnhancer(draw_points=True)
 
                 faces, eye_one_vectors, eye_two_vectors, np_points, _ = predictor_obj.predict_eye_vector_and_face_points([img], time.time())
 
-                #pic, output = enhancer.process(faces, np_points, eye_one_vectors, eye_two_vectors)
-                app.draw_image(faces[0], max_size="small")
+                pic, output = enhancer.process(faces[0], np_points[0], eye_one_vectors[0], eye_two_vectors[0])
+                app.draw_image(pic, max_size="large")
 
                 # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
             except:

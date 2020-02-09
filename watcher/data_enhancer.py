@@ -17,7 +17,7 @@ class AbsDataEnhancer:
         if type(self) == AbsDataEnhancer:
             raise NotImplementedError("AbsDataEnhancer process call")
 
-        if not isinstance(pic, Image.Image):
+        if isinstance(pic, np.ndarray):
             pic = pic.astype(dtype=np.uint8)
             pic = Image.fromarray(pic)
         pic = pic.convert('RGB')
@@ -114,7 +114,7 @@ class HeadNEyeDataEnhancer(HeadPositionAxisDataEnhancer):
         super().__init__(**kwargs)
 
     def process(self, pic, np_points, eye_vector_left, eye_vector_right):
-        pic, output = super().process(pic, np_points, draw_points=False)
+        pic, output = super().process(pic, np_points, draw_points=True)
         solver = pnp_solver.PoseEstimator((1080, 1920))
         drawer = ImageDraw.Draw(pic)
         rotation, translation = solver.solve_pose(np_points)
@@ -146,13 +146,13 @@ class HeadNEyeDataEnhancer(HeadPositionAxisDataEnhancer):
         return back_matrix
 
     def draw_eye_vector(self, drawer, eye_3d_vector, solver, rotation, translation, eye_pos):
-        eye_3d_vector[1] -= 0.1
+        #eye_3d_vector[1] -= 0.1
         if eye_pos == "l":
             eye_pos = (solver.model_points_68[36] + solver.model_points_68[39]) / 2.
         else:
             eye_pos = (solver.model_points_68[42] + solver.model_points_68[45]) / 2.
-        eye_pos += [0., 0., -9.]
-        eye_3d_vector = copy.deepcopy(eye_3d_vector) * 50
+       # eye_pos += [0., 0., -9.]
+        eye_3d_vector = copy.deepcopy(eye_3d_vector) * -50
        # eye_3d_vector = np.matmul(back_matrix, eye_3d_vector)
         #if eye_3d_vector[2] < 0:
         #    eye_3d_vector *= -1
