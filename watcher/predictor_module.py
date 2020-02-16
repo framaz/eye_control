@@ -1,5 +1,6 @@
 import collections
 import copy
+import functools
 import json
 import subprocess
 import threading
@@ -30,7 +31,28 @@ class BasicPredictor:
         raise NotImplementedError
 
     def get_mouse_coords(self, cameras, time_now):
-        raise NotImplementedError
+        face, results, out_inform = self.predict(cameras, time_now)
+        # out_inform["rotator"] -= angle
+        # out_inform["cutter"] -= offset
+        print(str(out_inform))
+
+        result = list(results)
+        results = [0, 0]
+        for cam in result:
+            for eye in cam:
+                results[0] += eye[0]
+                results[1] += eye[1]
+        results[0] /= len(result) * 2
+        results[1] /= len(result) * 2
+        if results[0] < 0:
+            results[0] = 0
+        if results[1] < 0:
+            results[1] = 0
+        if results[0] >= 1920:
+            results[0] = 1919
+        if results[1] >= 1080:
+            results[1] = 1079
+        pyautogui.moveTo(results[0], results[1])
 
     def predict(self, cameras, time_now, ):
         imgs = []
@@ -56,29 +78,7 @@ class BasicPredictor:
 
 
 class GoodPredictor(BasicPredictor):
-    def get_mouse_coords(self, cameras, time_now):
-        face, results, out_inform = self.predict(cameras, time_now)
-        # out_inform["rotator"] -= angle
-        # out_inform["cutter"] -= offset
-        print(str(out_inform))
 
-        result = list(results)
-        results = [0, 0]
-        for cam in result:
-            for eye in cam:
-                results[0] += eye[0]
-                results[1] += eye[1]
-        results[0] /= len(result) * 2
-        results[1] /= len(result) * 2
-        if results[0] < 0:
-            results[0] = 0
-        if results[1] < 0:
-            results[1] = 0
-        if results[0] >= 1920:
-            results[0] = 1919
-        if results[1] >= 1080:
-            results[1] = 1079
-        pyautogui.moveTo(results[0], results[1])
     def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
         faces = []
         eye_one_vectors = []
@@ -96,8 +96,8 @@ class GoodPredictor(BasicPredictor):
 
                     # face_cutter = calibrator.FaceCropper(np_points)
                     # face, np_points = face_cutter.apply_forth(img)
-                   # rotator = calibrator.RotationTranslation(np_points)
-                    #face, np_points = rotator.apply_forth(img)
+                    # rotator = calibrator.RotationTranslation(np_points)
+                    # face, np_points = rotator.apply_forth(img)
                     to_out_face = face
                     # tmp_out_inform["cutter"] = face_cutter.get_modification_data()
                     # tmp_out_inform["rotator"] = rotator.get_modification_data()
@@ -311,8 +311,8 @@ class DebugPredictor(BasicPredictor):
         self.rotation_vector = np.array([0., 0., 0.])
 
     def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
-        projections, _ = cv2.projectPoints(self.face_points, np.array([0., 0., 0.]), np.array([0., 0., 0.],),
-                                        self.solver.camera_matrix, self.solver.dist_coeefs)
+        projections, _ = cv2.projectPoints(self.face_points, np.array([0., 0., 0.]), np.array([0., 0., 0.], ),
+                                           self.solver.camera_matrix, self.solver.dist_coeefs)
         projections = projections.reshape((-1, 2))
         right_eye_gaze = np.copy(self.right_eye_gaze)
         left_eye_gaze = np.copy(self.left_eye_gaze)
@@ -337,3 +337,33 @@ class DebugPredictor(BasicPredictor):
         results[0] /= len(result) * 2
         results[1] /= len(result) * 2
         self.client.set_mouse_position(*results)
+
+
+class GazeMLPredictor(BasicPredictor):
+    def __init__(self):
+        self.gazeML_process = subprocess.Popen(
+            ["python", "./from_internet_or_for_from_internet/GazeML/src/elg_demo.py"],
+            stdout=subprocess.PIPE)
+        self.eye_one_target = np.array([0, 0, 1])
+        self.eye_two_target = np.array([0, 0, 1])
+        self.np_points = np.zeros((68, 2))
+        def read_from_subprocess(object, process):
+            while True:
+                line = process.stdout.readline()
+                try:
+                    dict = json.loads(line)
+                    if dict["eye_number"] == 0:
+                        object.eye_one_target = np.array([-dict["x"], -dict["y"], dict["z"]])
+                    else:
+                        object.eye_two_target = np.array([-dict["x"], -dict["y"], dict["z"]])
+                    object.np_points = np.array(dict['np_points']).reshape((68, 2))
+                except json.decoder.JSONDecodeError:
+                    pass
+
+        thread_func = functools.partial(read_from_subprocess, self, self.gazeML_process)
+        thread = threading.Thread(target=thread_func)
+        thread.start()
+
+    def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
+        time.sleep(0.2)
+        return [np.zeros((500, 500))], [self.eye_one_target], [self.eye_two_target], [self.np_points], {}

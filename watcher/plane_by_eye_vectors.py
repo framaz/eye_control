@@ -6,7 +6,14 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import scipy
 
-from predictor_module import normalize
+def normalize(v):
+    norm = 0
+    for vi in v:
+        norm += vi * vi
+    norm = sqrt(norm)
+    if norm == 0:
+        return v
+    return v / norm
 
 
 def get_normal_vector(vector0, vector1):

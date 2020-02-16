@@ -115,7 +115,7 @@ class CameraHolder:
             img_str = base64.b64encode(buffered.getvalue())
             return img_str
 
-    def __init__(self, camera: cv2.VideoCapture):
+    def __init__(self, camera: cv2.VideoCapture, calibration_needed=True):
         self.camera = camera
         self.l_eye = None
         self.r_eye = None
@@ -125,15 +125,13 @@ class CameraHolder:
         self.calibrator = calibrator.Calibrator(self.solver)
         self.screen = None
         self.head = None
-        self.camera_calibration_server = self.CameraCalibrationServer(camera)
-        zpc = zerorpc.Server(self.camera_calibration_server)
-        self.camera_calibration_server.add_server(zpc)
-        zpc.bind('tcp://127.0.0.1:4243')
-        self.electron = subprocess.Popen(["./frontend/node_modules/.bin/electron", "./frontend", "camera_calibrator"])
-        zpc.run()
-
-    def configure(self):
-        pass
+        if calibration_needed:
+            self.camera_calibration_server = self.CameraCalibrationServer(camera)
+            zpc = zerorpc.Server(self.camera_calibration_server)
+            self.camera_calibration_server.add_server(zpc)
+            zpc.bind('tcp://127.0.0.1:4243')
+            self.electron = subprocess.Popen(["./frontend/node_modules/.bin/electron", "./frontend", "camera_calibrator"])
+            zpc.run()
 
     def calibration_tick(self, time_now, predictor):
         img = [self.get_picture()]
@@ -169,6 +167,13 @@ class CameraHolder:
             eye_point = [0, 0, 0]
         return self.screen.get_pixel(eye_vector, eye_point)
 
+class StabCameraHolder(CameraHolder):
+    def __init__(self, camera):
+        super().__init__(camera, calibration_needed=False)
+        camera.release()
+    def get_picture(self):
+        img = PIL.Image.fromarray(np.zeros((25, 25)))
+        return img
 
 class Eye:
     def __init__(self, eye_type):
@@ -242,7 +247,7 @@ class Screen:
             pair = {'left': [left_eye, l_eye.corner_vectors[i]], 'right': [right_eye, r_eye.corner_vectors[i]]}
             pairs_list.append(pair)
         self.a, self.b, self.c, self.d = plane_by_eye_vectors.get_plane_by_eye_vectors(pairs_list)
-        # self.a, self.b, self.c, self.d = 0, 0, 1, 450
+        self.a, self.b, self.c, self.d = 0, 0, 1, -450
         self.width = 0.54
         self.heigth = 0.30375
         self.pixel_width = 1920

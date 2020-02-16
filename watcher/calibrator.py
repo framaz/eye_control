@@ -8,7 +8,6 @@ import camera_holders
 import eye_module
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 import matplotlib.pyplot as plt
-from predictor_module import GoodPredictor
 from seen_to_screen import SeenToScreenTranslator
 
 FIRST_SMOOTH_TIME = 1
