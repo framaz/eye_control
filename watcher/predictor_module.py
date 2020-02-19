@@ -252,7 +252,7 @@ def normalize(v):
     return v / norm
 
 
-solver = pnp_solver.PoseEstimator((1080, 1920))
+solver = pnp_solver.PoseEstimator((720, 1280))
 
 
 def thread_func(debug_predictor, backend_server):
@@ -297,7 +297,7 @@ class DebugPredictor(BasicPredictor):
         self.plane = np.array([0., 1., 0., -100.])
         thread = threading.Thread(target=thread_func, args=(self, self.backend))
         thread.start()
-        self.solver = pnp_solver.PoseEstimator((1080, 1920))
+        self.solver = pnp_solver.PoseEstimator((720, 1280))
         self.client = zerorpc.Client()
         self.client.connect("tcp://127.0.0.1:4242")
         self.world_to_camera = np.zeros((3, 4), dtype=np.float64)
@@ -353,9 +353,9 @@ class GazeMLPredictor(BasicPredictor):
                 try:
                     dict = json.loads(line)
                     if dict["eye_number"] == 0:
-                        object.eye_one_target = np.array([-dict["x"], -dict["y"], dict["z"]])
+                        object.eye_two_target = np.array([dict["x"], -dict["y"], dict["z"]])
                     else:
-                        object.eye_two_target = np.array([-dict["x"], -dict["y"], dict["z"]])
+                        object.eye_one_target = np.array([dict["x"], -dict["y"], dict["z"]])
                     object.np_points = np.array(dict['np_points']).reshape((68, 2))
                 except json.decoder.JSONDecodeError:
                     pass
@@ -366,4 +366,4 @@ class GazeMLPredictor(BasicPredictor):
 
     def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
         time.sleep(0.2)
-        return [np.zeros((500, 500))], [self.eye_one_target], [self.eye_two_target], [self.np_points], {}
+        return [np.zeros((720, 1280))], [self.eye_one_target], [self.eye_two_target], [self.np_points], {}

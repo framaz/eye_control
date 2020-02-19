@@ -56,7 +56,7 @@ PADDING = 10
 
 
 def process_eye(face, np_points):
-    solver = pnp_solver.PoseEstimator((1080, 1920))
+    solver = pnp_solver.PoseEstimator((720, 1080))
     faceModel = np.array([[-4.50967681e+01, -4.83773045e-01, 2.39702984e+00],
                           [-2.13128582e+01, 4.83773045e-01, -2.39702984e+00],
                           [2.13128582e+01, 4.83773045e-01, -2.39702984e+00],

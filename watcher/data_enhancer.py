@@ -86,11 +86,11 @@ class HeadPositionAxisDataEnhancer(AbsDataEnhancer):
 
     def process(self, pic, np_points, draw_points=False):
         pic, output = super().process(pic, np_points)
-        solver = pnp_solver.PoseEstimator((1080, 1920))
+        solver = pnp_solver.PoseEstimator((720, 1280))
         rotation, translation = solver.solve_pose(np_points)
         if draw_points:
             drawer = ImageDraw.Draw(pic)
-            solver = pnp_solver.PoseEstimator((1080, 1920))
+            solver = pnp_solver.PoseEstimator((720, 1280))
             np_points = np_points.astype(dtype=np.float64)
             proj_points, _ = cv2.projectPoints(solver.model_points_68, rotation, translation, solver.camera_matrix, solver.dist_coeefs)
             proj_points = proj_points.astype(dtype=np.int64)
@@ -115,7 +115,7 @@ class HeadNEyeDataEnhancer(HeadPositionAxisDataEnhancer):
 
     def process(self, pic, np_points, eye_vector_left, eye_vector_right):
         pic, output = super().process(pic, np_points, draw_points=True)
-        solver = pnp_solver.PoseEstimator((1080, 1920))
+        solver = pnp_solver.PoseEstimator((720, 1080))
         drawer = ImageDraw.Draw(pic)
         rotation, translation = solver.solve_pose(np_points)
         back_matrix = self.get_triangle_face_to_just_face_matrix(solver)
@@ -186,7 +186,7 @@ class EyeVectorSurfaceProjectorDataEnhancer(AbsDataEnhancer):
 
     def process(self, pic, np_points, eye_vector_left, eye_vector_right):
         pic, output = super().process(pic, np_points)
-        solver = pnp_solver.PoseEstimator((1080, 1920))
+        solver = pnp_solver.PoseEstimator((720, 1080))
         drawer = ImageDraw.Draw(pic)
         drawer.rectangle([0, 0, 1920, 1080], fill=(255, 255, 255))
         middle = [960, 540]

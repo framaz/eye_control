@@ -25,7 +25,7 @@ cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 cam = camera_holders.StabCameraHolder(cam)
 cameras = list()
 cameras.append(cam)
-solver = pnp_solver.PoseEstimator((1080, 1920))
+solver = pnp_solver.PoseEstimator((720, 1280))
 
 if DEBUG_PREDICTOR:
     predictor_obj = predictor_module.DebugPredictor()
@@ -42,15 +42,13 @@ if not NO_CALIB_DEBUG:
             try:
             #    enhancer = data_enhancer.WidthHeightDataEnhancer(text_size=30)
                 # pic, output = enhancer.process(face, np_points)
-                # enhancer = data_enhancer.HeadPositionAxisDataEnhancer()
-                # pic, output = enhancer.process(face, np_points)
 
-         #       enhancer = data_enhancer.HeadNEyeDataEnhancer(draw_points=True)
+                enhancer = data_enhancer.HeadNEyeDataEnhancer(draw_points=True)
 
                 faces, eye_one_vectors, eye_two_vectors, np_points, _ = predictor_obj.predict_eye_vector_and_face_points([img], time.time())
 
-             #   pic, output = enhancer.process(faces[0], np_points[0], eye_one_vectors[0], eye_two_vectors[0])
-                app.draw_image(faces[0], max_size="large")
+                pic, output = enhancer.process(faces[0], np_points[0], eye_one_vectors[0], eye_two_vectors[0])
+                app.draw_image(pic, max_size="large")
 
                 # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
             except:

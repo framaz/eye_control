@@ -157,7 +157,6 @@ def get_plane_by_eye_vectors(screen_points):
     ax = fig.add_subplot(111, projection='3d')
     colors = ['#ff0000', '#00ff00', '#0000ff', '#000000', '#ffffff']
     for screen_point, color in zip(screen_points, colors):
-        z.append(get_point_between_lines(*screen_point['left'], *screen_point['right']))
         arr = np.array(screen_point['left'])
         arr[1] = arr[1] * 100 + arr[0]
         ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], c=color)
@@ -165,7 +164,7 @@ def get_plane_by_eye_vectors(screen_points):
         arr[1] = arr[1] * 100 + arr[0]
         ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], c=color)
     z = np.array(z)
-    ax.scatter(z[:, 0], z[:, 1], z[:, 2])
+  #  ax.scatter(z[:, 0], z[:, 1], z[:, 2])
     res1 = minimize_svd(z)
     res2 = minimize(z, plane_by_3_points(z[0], z[2], z[-1]))
     res2 = res2['x']
@@ -177,6 +176,6 @@ def get_plane_by_eye_vectors(screen_points):
 
     val3 = function(res3, z)
     res = np.array([res1, res2, res3])[np.argmin([val1, val2, val3])]
-    draw_plot(res, ax)
+    #draw_plot(res, ax)
     #plt.show()
     return res

@@ -93,6 +93,8 @@ class FaceCropper(BasicTranslation):
 
 def detect_face_points_dlib(src, cropping_needed=True):
     img = copy.deepcopy(src)
+    img = np.flip(img, axis=1)
+    img_out = copy.deepcopy(img)
     cur_time = time.time()
     smaller_img = copy.deepcopy(img)
     if not (isinstance(src, Image.Image)):
@@ -124,7 +126,7 @@ def detect_face_points_dlib(src, cropping_needed=True):
             # offset[1] *= src.height / smaller_img_size[1]
             for i in range(shape.num_parts):
                 np_points[i] += offset
-            return np_points, resizing_cropper, src
+            return np_points, resizing_cropper, img_out
     except:
         pass
 
