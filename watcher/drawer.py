@@ -29,7 +29,7 @@ class App:
         self.corner_num.config(text=corner)
 
     def draw_image(self, image: Image.Image, max_size="small"):
-        if not(isinstance(image, Image.Image)):
+        if not (isinstance(image, Image.Image)):
             image = image.astype(dtype=np.uint8)
             image = Image.fromarray(image)
         max_size = {"small": 512, "medium": 1024, "large": 1536, "no": 10000000}[max_size]
@@ -53,7 +53,9 @@ class App:
         self.window.update_idletasks()
         self.window.update()
 
+
 cycling_flag = True
+
 
 def button_callback():
     global cycling_flag

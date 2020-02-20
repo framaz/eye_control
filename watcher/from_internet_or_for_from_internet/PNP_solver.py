@@ -4,7 +4,7 @@
 import cv2
 import numpy as np
 import os
-from local_directory_change_decorator import path_change_decorator
+from utilities import path_change_decorator
 
 model_list = [
     30, 31, 33, 35, 26, 28, 29, 30,  # nose

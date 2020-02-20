@@ -2,17 +2,18 @@ import time
 import tkinter as tk
 
 import cv2
-import pyautogui
 from cv2 import VideoCapture
 
-import calibrator
+import data_enhancer.eye_vector_enhancer
+from camera_holders import camera_system_factory
 import camera_holders
 import data_enhancer
-import predictor_module
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 import drawer
-import tensorflow as tf
-DEBUG_PREDICTOR = False
+
+import predictor_module.visual_debug_predictor
+
+DEBUG_PREDICTOR = True
 NO_CALIB_DEBUG = False
 
 
@@ -28,10 +29,9 @@ cameras.append(cam)
 solver = pnp_solver.PoseEstimator((720, 1280))
 
 if DEBUG_PREDICTOR:
-    predictor_obj = predictor_module.DebugPredictor()
+    predictor_obj = predictor_module.VisualDebugPredictor()
 else:
-    predictor_obj = predictor_module.GoodPredictor()
-predictor_obj =predictor_module.GazeMLPredictor()
+    predictor_obj = predictor_module.GazeMLPredictor()
 
 if not NO_CALIB_DEBUG:
     drawer.cycling_flag = True
@@ -43,12 +43,12 @@ if not NO_CALIB_DEBUG:
             #    enhancer = data_enhancer.WidthHeightDataEnhancer(text_size=30)
                 # pic, output = enhancer.process(face, np_points)
 
-                enhancer = data_enhancer.HeadNEyeDataEnhancer(draw_points=True)
+                enhancer = data_enhancer.eye_vector_enhancer.EyeVectorEnhancer(draw_points=True)
 
                 faces, eye_one_vectors, eye_two_vectors, np_points, _ = predictor_obj.predict_eye_vector_and_face_points([img], time.time())
 
-                pic, output = enhancer.process(faces[0], np_points[0], eye_one_vectors[0], eye_two_vectors[0])
-                app.draw_image(pic, max_size="large")
+     #           pic, output = enhancer.process(faces[0], np_points[0], eye_one_vectors[0], eye_two_vectors[0])
+                app.draw_image(faces[0], max_size="large")
 
                 # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
             except:
@@ -57,7 +57,7 @@ if not NO_CALIB_DEBUG:
     offset = 0
     angle = 0
 
-    for corner in calibrator.corner_dict:
+    for corner in camera_system_factory.corner_dict:
         drawer.cycling_flag = True
         app.change_corner(corner)
         last_time = time.time()
