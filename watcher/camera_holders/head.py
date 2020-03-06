@@ -8,23 +8,31 @@ from utilities import get_world_to_camera_matrix
 
 
 class Head:
-    def __init__(self, starting_rotation_vector, starting_translation: np.ndarray, solver: pnp_solver):
-        self.solver = solver
-        self.start_rotation = starting_rotation_vector
-        self.start_translation = starting_translation
-        self.rotation_history = collections.deque()
-        self.translation_history = collections.deque()
+    """Class for head translation and rotation
 
-    def add_history(self, np_points, time_now):
-        rotation, translation = self.solver.solve_pose(np_points)
+    :ivar solver: (pnp_solver.PoseEstimator)
+    :ivar _rotation_history"""
+    def __init__(self, solver: pnp_solver.PoseEstimator):
+        """Constructs object"""
+        self._solver = solver
+        self._rotation_history = collections.deque()
+        self._translation_history = collections.deque()
+
+    def get_smoothed_position(self, np_points: np.ndarray, time_now: float):
+        """Add current head pos to history and get smoothed head pos
+
+        :param np_points:
+        :param time_now:
+        :return:
+        """
+        rotation, translation = self._solver.solve_pose(np_points)
+
         rotation = rotation.reshape((3,))
         translation = translation.reshape((3,))
-        self.rotation_history.append([*rotation, time_now])
-        self.translation_history.append([*translation, time_now])
-        smoothed_rotation = utilities.smooth_n_cut(self.rotation_history, time_now)
-        smoothed_translation = utilities.smooth_n_cut(self.translation_history, time_now)
-        return smoothed_rotation, smoothed_translation
 
-    def translate_vector_to_first_position(self, starting_rotation_vector, starting_translation):
-        to_new_world = get_world_to_camera_matrix(self.solver, starting_rotation_vector, starting_translation,
-                                                  is_vector_translation=True)
+        self._rotation_history.append([*rotation, time_now])
+        self._translation_history.append([*translation, time_now])
+
+        smoothed_rotation = utilities.smooth_n_cut(self._rotation_history, time_now)
+        smoothed_translation = utilities.smooth_n_cut(self._translation_history, time_now)
+        return smoothed_rotation, smoothed_translation

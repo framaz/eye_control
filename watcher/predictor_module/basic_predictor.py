@@ -43,7 +43,7 @@ class BasicPredictor:
         results = []
         for i, camera in zip(range(len(cameras)), cameras):
             results.append(
-                camera.update_gazes_history(eye_one_vectors[i], eye_two_vectors[i], np_points_all[i], time_now))
+                camera.get_screen_positions(eye_one_vectors[i], eye_two_vectors[i], np_points_all[i], time_now))
 
         def face_to_img(face):
             if not isinstance(face, Image.Image):

@@ -103,7 +103,7 @@ def get_pixel(tens, a, b, c, d,
     y = k * y
     z = k * z
     pixel_x = x / width * pixel_width
-    pixel_y = y / heigth * pixel_heigth
+    pixel_y = y / height * pixel_heigth
     return pixel_x, pixel_y """
     fl = np.array([a, b, c])
     ratios = np.array([width * pixel_width, heigth * pixel_heigth])

@@ -84,13 +84,6 @@ class PoseEstimator:
         pyplot.show()
 
     def solve_pose(self, image_points, camera_points=None):
-        """np.array([[-4.50967681e+01, -4.83773045e-01, 2.39702984e+00],
-                          [-2.13128582e+01, 4.83773045e-01, -2.39702984e+00],
-                          [2.13128582e+01, 4.83773045e-01, -2.39702984e+00],
-                          [4.50967681e+01, -4.83773045e-01, 2.39702984e+00],
-                          [-2.62995769e+01, 6.85950353e+01, -9.86076132e-32],
-                          [2.62995769e+01, 6.85950353e+01, -9.86076132e-32],
-                         ]))"""
         """
         Solve pose from image points
         Return (rotation_vector, translation_vector) as pose.
