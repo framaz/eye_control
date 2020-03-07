@@ -8,7 +8,7 @@ from .data_enhancer import DataEnhancer
 class PointDataEnhancer(DataEnhancer):
     """Draws facial landmarks
 
-    :ivar point_radius:
+    :ivar point_radius: (int), in pixels
     """
     def __init__(self, point_size: int = 2, **kwargs):
         """Constructor

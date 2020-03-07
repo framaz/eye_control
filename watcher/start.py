@@ -80,7 +80,7 @@ if not NO_CALIB_DEBUG:
 while True:
     time_now = time.time()
     try:
-        predictor_obj.get_mouse_coords(cameras, time_now)
+        predictor_obj.move_mouse_to_gaze_pixel(cameras, time_now)
     except Exception as e:
         e = e
     #   app.draw_image(face)

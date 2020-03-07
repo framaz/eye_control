@@ -68,7 +68,7 @@ class VisualDebugPredictor(BasicPredictor):
         self.face_points = self.solver.model_points_68
         self.rotation_vector = np.array([0., 0., 0.])
 
-    def predict_eye_vector_and_face_points(self, imgs, time_now, configurator=None):
+    def predict_eye_vector_and_face_points(self, imgs, time_now):
         projections, _ = cv2.projectPoints(self.face_points, np.array([0., 0., 0.]), np.array([0., 0., 0.], ),
                                            self.solver.camera_matrix, self.solver.dist_coeefs)
         projections = projections.reshape((-1, 2))
@@ -80,7 +80,7 @@ class VisualDebugPredictor(BasicPredictor):
             projections += np.random.normal(0, 2, (68, 2))
         return imgs, [right_eye_gaze], [left_eye_gaze], [projections], {}
 
-    def get_mouse_coords(self, cameras, time_now):
+    def move_mouse_to_gaze_pixel(self, cameras, time_now):
         face, results, out_inform = self.predict(cameras, time_now)
         # out_inform["rotator"] -= angle
         # out_inform["cutter"] -= offset

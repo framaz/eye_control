@@ -8,7 +8,7 @@ from .data_enhancer import DataEnhancer
 class CornerTextEnhancer(DataEnhancer):
     """Enhancer to write text in left top corner
 
-    :ivar _text_size: in pixels"""
+    :ivar _text_size: (int), in pixels"""
 
     def __init__(self, text_size: int = 9, **kwargs):
         """Constructs obj
