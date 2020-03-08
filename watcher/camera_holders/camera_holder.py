@@ -14,7 +14,7 @@ from PIL import Image
 import predictor_module
 import utilities
 from from_internet_or_for_from_internet import PNP_solver as pnp_solver
-from utilities import vector_to_camera_coordinate_system
+from utilities import get_world_to_camera_matrix
 from .camera_system_factory import CameraSystemFactory
 
 
@@ -113,7 +113,7 @@ class CameraHolder:
         """
         head_rotation, head_translation = self._head.get_smoothed_position(np_points, time_now)
 
-        world_to_camera = vector_to_camera_coordinate_system(head_rotation, head_translation)
+        world_to_camera = get_world_to_camera_matrix(head_rotation, head_translation)
 
         left_eye = sum(self._solver.model_points_68[36:41]) / 6
         right_eye = sum(self._solver.model_points_68[42:47]) / 6

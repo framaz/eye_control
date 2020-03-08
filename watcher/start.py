@@ -45,7 +45,8 @@ if not NO_CALIB_DEBUG:
 
                 enhancer = data_enhancer.eye_vector_enhancer.EyeVectorEnhancer(draw_points=True)
 
-                faces, eye_one_vectors, eye_two_vectors, np_points, _ = predictor_obj.predict_eye_vector_and_face_points([img], time.time())
+                faces, eye_one_vectors, eye_two_vectors, np_points, _ = \
+                    predictor_obj.predict_eye_vector_and_face_points([img], time.time())
 
      #           pic, output = enhancer.process(faces[0], np_points[0], eye_one_vectors[0], eye_two_vectors[0])
                 app.draw_image(faces[0], max_size="large")

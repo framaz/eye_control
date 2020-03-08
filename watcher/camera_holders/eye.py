@@ -50,7 +50,7 @@ class Eye:
 
     def get_screen_point(self,
                          vector: np.ndarray,
-                         time_now: int,
+                         time_now: float,
                          eye_center: np.ndarray) -> np.ndarray:
         """Remember and smooth current gaze vector, get pixel on screen
 

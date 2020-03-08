@@ -71,7 +71,7 @@ def get_rotation_matrix(angles: np.ndarray) -> np.ndarray:
 class BackendForDebugPredictor:
     """Used for visual debug all watcher - electron debug interaction
 
-    All visal debug predictor logic is implemented in this class
+    All visual debug predictor logic is implemented in this class
 
     Should be run as a subprocess as gevent doesnt like threads
     For electron -> backend interaction remote procedure call via zerorpc is used

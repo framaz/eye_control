@@ -8,7 +8,7 @@ import typing
 from PIL import ImageDraw, Image
 
 from from_internet_or_for_from_internet import PNP_solver as pnp_solver
-from utilities import get_world_to_camera_matrix
+from utilities import get_world_to_camera_projection_matrix
 from .landmarks_avg_person_enhancer import LandmarksAvgPersonEnhancer
 
 
@@ -33,7 +33,7 @@ def draw_eye_vector(drawer: ImageDraw.ImageDraw, eye_3d_vector: np.ndarray,
     eye_3d_vector = copy.deepcopy(eye_3d_vector) * -50
 
     # eye coordinate in camera coordinate system is determined
-    to_camera_matrix = get_world_to_camera_matrix(solver, rotation, translation)
+    to_camera_matrix = get_world_to_camera_projection_matrix(solver, rotation, translation)
     eye_pos = np.matmul(to_camera_matrix, [*eye_pos, 1])
 
     no_rot_vector, _ = cv2.Rodrigues(np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]))

@@ -16,7 +16,7 @@ class BasicPredictor:
     def predict_eye_vector_and_face_points(
             self,
             imgs: typing.List[Image.Image],
-            time_now: int) -> typing.Tuple[
+            time_now: float) -> typing.Tuple[
                 typing.List[Image.Image],
                 typing.List[np.ndarray],
                 typing.List[np.ndarray],
@@ -35,7 +35,7 @@ class BasicPredictor:
         """
         raise NotImplementedError
 
-    def move_mouse_to_gaze_pixel(self, cameras: typing.List[camera_holders.CameraHolder], time_now: int) -> None:
+    def move_mouse_to_gaze_pixel(self, cameras: typing.List[camera_holders.CameraHolder], time_now: float) -> None:
         """Find a target gaze pixel for all cameras and move cursor there
 
         If gaze is out of bounds then it is fit to the bounds
@@ -68,7 +68,7 @@ class BasicPredictor:
         pyautogui.moveTo(results[0], results[1])
 
     def predict(self, cameras: typing.List[camera_holders.CameraHolder],
-                time_now: int) -> (typing.List[Image.Image], typing.List[np.ndarray], dict):
+                time_now: float) -> (typing.List[Image.Image], typing.List[np.ndarray], dict):
         """For all cameras predict their pixel gaze targets
 
         :param cameras: list of all cameras

@@ -58,7 +58,7 @@ class CameraSystemFactory:
 
     def calibrate_remember(self,
                            img: PIL.Image.Image,
-                           time_now: int,
+                           time_now: float,
                            predictor: BasicPredictor) -> str:
         """Makes a tick of remembering of current corner gaze
 
@@ -123,7 +123,7 @@ class CameraSystemFactory:
         screen = camera_holders.Screen(self._left_eye, self._right_eye, self._solver, rotation, translation)
 
         # Eye centers are calculated to make translators
-        world_to_camera = utilities.vector_to_camera_coordinate_system(rotation, translation)
+        world_to_camera = utilities.get_world_to_camera_matrix(rotation, translation)
         left_eye = sum(self._solver.model_points_68[36:41]) / 6
         right_eye = sum(self._solver.model_points_68[42:47]) / 6
         left_eye = np.array([*left_eye, 1])

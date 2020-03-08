@@ -66,7 +66,7 @@ class GazeMLPredictor(BasicPredictor):
     def predict_eye_vector_and_face_points(
             self,
             imgs: typing.List[Image.Image],
-            time_now: int) -> typing.Tuple[
+            time_now: float) -> typing.Tuple[
                 typing.List[Image.Image],
                 typing.List[np.ndarray],
                 typing.List[np.ndarray],

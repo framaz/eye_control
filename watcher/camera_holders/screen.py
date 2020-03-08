@@ -4,7 +4,7 @@ import numpy as np
 import typing
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from utilities import vector_to_camera_coordinate_system
+from utilities import get_world_to_camera_matrix
 import from_internet_or_for_from_internet.PNP_solver as pnp_solver
 
 
@@ -37,7 +37,7 @@ class Screen:
 
         self.solver = solver
 
-        world_to_camera = vector_to_camera_coordinate_system(head_rotation, head_translation)
+        world_to_camera = get_world_to_camera_matrix(head_rotation, head_translation)
         kek = []
 
         # translate all face points to camera coordinate system

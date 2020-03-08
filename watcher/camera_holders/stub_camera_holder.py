@@ -1,4 +1,4 @@
-import PIL
+from PIL import Image
 import numpy as np
 
 from .camera_holder import CameraHolder
@@ -14,7 +14,7 @@ class StubCameraHolder(CameraHolder):
         super().__init__(camera, calibration_needed=False)
         camera.release()
 
-    def get_picture(self):
+    def get_picture(self) -> Image.Image:
         """Return a stub black picture"""
-        img = PIL.Image.fromarray(np.zeros((720, 640)))
+        img = Image.fromarray(np.zeros((720, 640)))
         return img
