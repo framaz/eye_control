@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections
 
 import numpy as np
-from matplotlib import pyplot as plt
 
 import utilities
 from . import camera_system_factory, seen_to_screen

@@ -4,12 +4,13 @@ import warnings
 from io import BytesIO
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy
 import numpy as np
 import zerorpc
 from PIL import Image
 
-import from_internet_or_for_from_internet.PNP_solver as pnp_solver
+import from_internet_or_for_from_internet.PNP_solver as PNP_solver
 from camera_holders import seen_to_screen
 
 
@@ -24,7 +25,6 @@ def fig2img(fig):
     # put the figure pixmap into a numpy array
     buf = fig2data(fig)
     buf = buf[:, :, 0:3]
-    w, h, d = buf.shape
     return Image.fromarray(buf)
 
 
@@ -116,7 +116,7 @@ class BackendForDebugPredictor:
         self._draw_corner_vectors = draw_corner_vectors
         self._corner_vectors = []
 
-        self._solver = pnp_solver.PoseEstimator()
+        self._solver = PNP_solver.PoseEstimator()
 
         self._eye_right = sum(self._solver.model_points_68[36:41]) / 6
         self._eye_left = sum(self._solver.model_points_68[42:47]) / 6
@@ -336,7 +336,7 @@ class BackendForDebugPredictor:
         if point_needed:
             plt_axis.scatter(*point, color=color)
 
-    def _draw_plane(self, axis: plt.Axes) -> None:
+    def _draw_plane(self, axis: Axes3D) -> None:
         """Draw plane that is not perpendicular to z and x axes
 
         :param axis: where to draw
@@ -345,7 +345,6 @@ class BackendForDebugPredictor:
         xx, zz = np.meshgrid(range(-150, 151, 50), range(-150, 151, 50))
         a, b, c, d = self._plane
         yy = - (d + a * xx + c * zz) / b
-
         axis.plot_wireframe(xx, yy, zz)
 
     def _get_plane_line_cross_point(self, point: np.ndarray, vector: np.ndarray) -> np.ndarray:

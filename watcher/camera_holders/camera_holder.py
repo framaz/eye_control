@@ -12,8 +12,7 @@ import zerorpc
 from PIL import Image
 
 import predictor_module
-import utilities
-from from_internet_or_for_from_internet import PNP_solver as pnp_solver
+from from_internet_or_for_from_internet import PNP_solver as PNP_solver
 from utilities import get_world_to_camera_matrix
 from .camera_system_factory import CameraSystemFactory
 
@@ -48,7 +47,7 @@ class CameraHolder:
 
         width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
         height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        self._solver = pnp_solver.PoseEstimator((height, width))
+        self._solver = PNP_solver.PoseEstimator((height, width))
 
         self._factory = CameraSystemFactory(self._solver)
 
@@ -65,7 +64,7 @@ class CameraHolder:
             zpc.run()
 
     def calibration_tick(self, time_now: float,
-                         predictor: predictor_module.BasicPredictor) -> float:
+                         predictor: predictor_module.BasicPredictor) -> str:
         """Just call a tick of _factory
             
         :param time_now: current time to remember
@@ -106,7 +105,7 @@ class CameraHolder:
         """Remembers current gazes and head pos and finds pixel gaze target.
 
         :param eye_one_vector: gaze vector from first eye
-        :param eye_two_vector: gaze vector         #           image = cv2.fastNlMeansDenoising(image.reshape((*(image.shape), 1)))from second vector
+        :param eye_two_vector: gaze vector
         :param np_points: 68 face markers detected by dlib
         :param time_now: current time
         :return:

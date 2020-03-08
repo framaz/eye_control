@@ -8,14 +8,13 @@ import data_enhancer.eye_vector_enhancer
 from camera_holders import camera_system_factory
 import camera_holders
 import data_enhancer
-import from_internet_or_for_from_internet.PNP_solver as pnp_solver
+import from_internet_or_for_from_internet.PNP_solver as PNP_solver
 import drawer
 
 import predictor_module.visual_debug_predictor
 
 DEBUG_PREDICTOR = True
 NO_CALIB_DEBUG = False
-
 
 app = drawer.App(tk.Tk(), "Tkinter and OpenCV", drawer.button_callback)
 # Create a window and pass it to the Application object
@@ -26,7 +25,7 @@ cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 cam = camera_holders.StubCameraHolder(cam)
 cameras = list()
 cameras.append(cam)
-solver = pnp_solver.PoseEstimator((720, 1280))
+solver = PNP_solver.PoseEstimator((720, 1280))
 
 if DEBUG_PREDICTOR:
     predictor_obj = predictor_module.VisualDebugPredictor()
@@ -40,7 +39,7 @@ if not NO_CALIB_DEBUG:
             img = camera.get_picture()
             # img = img.resize((500, 500))
             try:
-            #    enhancer = data_enhancer.WidthHeightDataEnhancer(text_size=30)
+                # enhancer = data_enhancer.WidthHeightDataEnhancer(text_size=30)
                 # pic, output = enhancer.process(face, np_points)
 
                 enhancer = data_enhancer.eye_vector_enhancer.EyeVectorEnhancer(draw_points=True)
@@ -48,15 +47,12 @@ if not NO_CALIB_DEBUG:
                 faces, eye_one_vectors, eye_two_vectors, np_points, _ = \
                     predictor_obj.predict_eye_vector_and_face_points([img], time.time())
 
-     #           pic, output = enhancer.process(faces[0], np_points[0], eye_one_vectors[0], eye_two_vectors[0])
+                # pic, output = enhancer.process(faces[0], np_points[0], eye_one_vectors[0], eye_two_vectors[0])
                 app.draw_image(faces[0], max_size="large")
 
                 # pyautogui.moveTo(1920 - results[0]*10, results[1]*10)
             except:
                 app.draw_image(img)
-    offset, angle = 0, 0
-    offset = 0
-    angle = 0
 
     for corner in camera_system_factory.corner_dict:
         drawer.cycling_flag = True

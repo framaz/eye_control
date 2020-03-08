@@ -1,10 +1,9 @@
+from __future__ import annotations
+
 import pyautogui
 import typing
 from PIL import Image
 import numpy as np
-
-import camera_holders
-import utilities
 
 
 class BasicPredictor:
@@ -35,7 +34,7 @@ class BasicPredictor:
         """
         raise NotImplementedError
 
-    def move_mouse_to_gaze_pixel(self, cameras: typing.List[camera_holders.CameraHolder], time_now: float) -> None:
+    def move_mouse_to_gaze_pixel(self, cameras: typing.List[CameraHolder], time_now: float) -> None:
         """Find a target gaze pixel for all cameras and move cursor there
 
         If gaze is out of bounds then it is fit to the bounds
@@ -67,7 +66,7 @@ class BasicPredictor:
 
         pyautogui.moveTo(results[0], results[1])
 
-    def predict(self, cameras: typing.List[camera_holders.CameraHolder],
+    def predict(self, cameras: typing.List[CameraHolder],
                 time_now: float) -> (typing.List[Image.Image], typing.List[np.ndarray], dict):
         """For all cameras predict their pixel gaze targets
 

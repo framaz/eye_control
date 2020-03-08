@@ -3,8 +3,7 @@ import collections
 import numpy as np
 
 import utilities
-from from_internet_or_for_from_internet import PNP_solver as pnp_solver
-from utilities import get_world_to_camera_projection_matrix
+from from_internet_or_for_from_internet import PNP_solver as PNP_solver
 
 
 class Head:
@@ -12,7 +11,7 @@ class Head:
 
     :ivar solver: (pnp_solver.PoseEstimator)
     :ivar _rotation_history"""
-    def __init__(self, solver: pnp_solver.PoseEstimator):
+    def __init__(self, solver: PNP_solver.PoseEstimator):
         """Constructs object"""
         self._solver = solver
         self._rotation_history = collections.deque()

@@ -3,8 +3,7 @@ import numpy as np
 import typing
 from PIL import ImageDraw, Image
 
-import utilities
-from from_internet_or_for_from_internet import PNP_solver as pnp_solver
+from from_internet_or_for_from_internet import PNP_solver as PNP_solver
 from .data_enhancer import DataEnhancer
 
 
@@ -25,7 +24,7 @@ class LandmarksAvgPersonEnhancer(DataEnhancer):
         :return:
         """
         pic, output = super().process(pic, np_points)
-        solver = pnp_solver.PoseEstimator((720, 1280))
+        solver = PNP_solver.PoseEstimator((720, 1280))
         rotation, translation = solver.solve_pose(np_points)
 
         drawer = ImageDraw.Draw(pic)

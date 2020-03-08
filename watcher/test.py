@@ -5,7 +5,4 @@ from predictor_module.gazeml_predictor import GazeMLPredictor
 
 if __name__ == "__main__":
     kek = GazeMLPredictor()
-    while True:
-        azaz = kek.predict_eye_vector_and_face_points(None, 0)
-        if azaz[0][0] != 0:
-            print(azaz)
+

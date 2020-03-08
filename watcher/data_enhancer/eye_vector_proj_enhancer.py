@@ -3,7 +3,6 @@ from PIL import ImageDraw
 from PIL import Image
 import numpy as np
 
-from from_internet_or_for_from_internet import PNP_solver as pnp_solver
 from .data_enhancer import DataEnhancer
 
 

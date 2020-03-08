@@ -62,7 +62,7 @@ def get_screen_point_array(width: float, height: float):
     return np.array(result, dtype=np.float32)
 
 
-def list_points_to_triangle(points: typing.List[float]):
+def list_points_to_triangle(points: typing.List):
     """Forms triangles from a list of points
 
     Triangle order is in triangles list
@@ -174,7 +174,7 @@ class SeenToScreenTranslator:
                 min_value = min(distances)
         return triangle_target
 
-    def seen_to_screen(self, point: np.ndarray):
+    def seen_to_screen(self, point: typing.Union[np.ndarray, typing.List]):
         """Translate a point from outer system to screen pixel
 
         :param point: shape [2]

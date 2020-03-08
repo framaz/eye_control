@@ -1,12 +1,11 @@
 import collections
 
 import PIL.Image
-import matplotlib.pyplot as plt
 import numpy as np
 import typing
 
 import camera_holders
-import from_internet_or_for_from_internet.PNP_solver as pnp_solver
+import from_internet_or_for_from_internet.PNP_solver as PNP_solver
 import utilities
 from .eye import Eye
 from .head import Head
@@ -39,7 +38,8 @@ class CameraSystemFactory:
                                               used to store history of head rotation(rotation vector)
     :ivar _last_time: when last calibration tick was
     """
-    def __init__(self, solver: pnp_solver.PoseEstimator):
+
+    def __init__(self, solver: PNP_solver.PoseEstimator):
         """Constructor
 
         :param solver:
@@ -57,7 +57,7 @@ class CameraSystemFactory:
         self._right_eye = camera_holders.Eye()
 
     def calibrate_remember(self,
-                           img: PIL.Image.Image,
+                           img: typing.List[PIL.Image.Image],
                            time_now: float,
                            predictor: BasicPredictor) -> str:
         """Makes a tick of remembering of current corner gaze
@@ -85,10 +85,11 @@ class CameraSystemFactory:
             self._calibration_history_head_rotation.append(head_rotation_vect)
             self._calibration_history_head_translation.append(head_translation_vect)
 
-        return str(smooth_n_cut(self._calibration_history_left, time_now)) + \
-               str(smooth_n_cut(self._calibration_history_right, time_now)) + \
-               str(smooth_n_cut(self._calibration_history_head_translation, time_now)) + \
-               str(smooth_n_cut(self._calibration_history_head_rotation, time_now))
+        str_to_out = str(smooth_n_cut(self._calibration_history_left, time_now))
+        str_to_out += str(smooth_n_cut(self._calibration_history_right, time_now))
+        str_to_out += str(smooth_n_cut(self._calibration_history_head_translation, time_now))
+        str_to_out += str(smooth_n_cut(self._calibration_history_head_rotation, time_now))
+        return str_to_out
 
     def calibration_end(self, corner: typing.Union[int, str]) -> None:
         """Complete current corner gaze vector remembering
@@ -135,6 +136,7 @@ class CameraSystemFactory:
         self._right_eye.create_translator(screen, left_eye)
 
         return self._left_eye, self._right_eye, head
+
 
 # def create_translator(self):
 #     self.left_eye.create_translator()

@@ -7,13 +7,13 @@ import numpy as np
 import typing
 from PIL import ImageDraw, Image
 
-from from_internet_or_for_from_internet import PNP_solver as pnp_solver
+from from_internet_or_for_from_internet import PNP_solver as PNP_solver
 from utilities import get_world_to_camera_projection_matrix
 from .landmarks_avg_person_enhancer import LandmarksAvgPersonEnhancer
 
 
 def draw_eye_vector(drawer: ImageDraw.ImageDraw, eye_3d_vector: np.ndarray,
-                    solver: pnp_solver.PoseEstimator,
+                    solver: PNP_solver.PoseEstimator,
                     rotation: np.ndarray, translation: np.ndarray, eye_pos: str) -> None:
     """Draw gaze vector eye from eye on a picture drawer
 
@@ -64,9 +64,9 @@ class EyeVectorEnhancer(LandmarksAvgPersonEnhancer):
         :param eye_vector_right: shape [3]
         :return:
         """
-        pic, output = super().process(pic, np_points, draw_points=True)
+        pic, output = super().process(pic, np_points)
 
-        solver = pnp_solver.PoseEstimator((720, 1080))
+        solver = PNP_solver.PoseEstimator((720, 1080))
 
         drawer = ImageDraw.Draw(pic)
 

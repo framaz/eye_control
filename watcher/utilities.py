@@ -1,15 +1,16 @@
+from __future__ import annotations
+
 import math
 import os
-from collections import deque
+
 from math import sqrt
 
 import cv2
 import numpy as np
-import tensorflow as tf
-import typing
-from PIL import Image
 
-from from_internet_or_for_from_internet import PNP_solver
+import typing
+
+import from_internet_or_for_from_internet.PNP_solver as PNP_solver
 
 
 def path_change_decorator(func: typing.Callable) -> typing.Callable:
@@ -55,7 +56,8 @@ def normalize(v: np.ndarray):
     return v / norm
 
 
-def get_world_to_camera_matrix(rotation: np.ndarray, translation: np.ndarray) -> np.ndarray:
+def get_world_to_camera_matrix(rotation: typing.Union[np.ndarray, typing.List],
+                               translation: typing.Union[np.ndarray, typing.List]) -> np.ndarray:
     """Get world to camera coordinate system translation matrix
 
     :param rotation: shape [3], Rodrigues rotation vector

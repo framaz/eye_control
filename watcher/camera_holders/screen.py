@@ -4,8 +4,9 @@ import numpy as np
 import typing
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
 from utilities import get_world_to_camera_matrix
-import from_internet_or_for_from_internet.PNP_solver as pnp_solver
+import from_internet_or_for_from_internet.PNP_solver as PNP_solver
 
 
 class Screen:
@@ -18,8 +19,9 @@ class Screen:
     """
 
     def __init__(self, r_eye: Eye, l_eye: Eye,
-                 solver: pnp_solver.PoseEstimator,
-                 head_rotation: np.ndarray, head_translation: np.ndarray):
+                 solver: PNP_solver.PoseEstimator,
+                 head_rotation: typing.Union[np.ndarray, typing.List],
+                 head_translation: typing.Union[np.ndarray, typing.List]):
         """Construct object
 
         Also draws a plot
@@ -82,9 +84,11 @@ class Screen:
         [a, b, c] = normal_vector
         eye_middle = (left_eye + right_eye) / 2
         screen_point = eye_middle + length * normal_vector
+        # noinspection PyUnresolvedReferences
         d = - normal_vector @ screen_point
         self.a, self.b, self.c, self.d = a, b, c, d
 
+        # noinspection PyShadowingNames
         def draw_plot(plane, axis, min_x=-200, min_y=-200, max_x=205, max_y=205):
             a, b, c, d = plane
             xx, yy = np.meshgrid(range(min_x, max_x + 5, max_x - min_x), range(min_y, max_y + 5, max_y - min_y))

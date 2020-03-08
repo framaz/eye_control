@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import subprocess
 import threading
@@ -9,8 +11,7 @@ import zerorpc
 from PIL import Image
 
 import drawer
-from camera_holders import CameraHolder
-from from_internet_or_for_from_internet import PNP_solver as pnp_solver
+from from_internet_or_for_from_internet import PNP_solver as PNP_solver
 from utilities import path_change_decorator
 from .basic_predictor import BasicPredictor
 
@@ -26,7 +27,7 @@ class VisualDebugPredictor(BasicPredictor):
     :ivar _solver: (pnp_solver.PoseEstimator)
     :ivar _client: (zerorpc.Client): zerorpc client to communicate with backend
     :ivar _world_to_camera: (np.ndarray, shape [3, 4]), face to camera translation matrix
-    :ivar _non_transformed: (np.ndarray, shape [68, 3]), face landmarks in face coordinate system
+    :ivar non_transformed: (np.ndarray, shape [68, 3]), face landmarks in face coordinate system
     :ivar _face_points: (np.ndarray, shape [68, 3]), current face landmark pos in camera coordinate system
     :ivar
     :ivar
@@ -55,16 +56,16 @@ class VisualDebugPredictor(BasicPredictor):
         self._client = zerorpc.Client()
         self._client.connect("tcp://127.0.0.1:4242")
 
-        self._solver = pnp_solver.PoseEstimator((720, 1280))
+        self._solver = PNP_solver.PoseEstimator((720, 1280))
 
         self._world_to_camera = np.zeros((3, 4), dtype=np.float64)
         self._world_to_camera[0, 0] = 1
         self._world_to_camera[1, 1] = 1
         self._world_to_camera[2, 2] = 1
 
-        self._non_transformed = np.ones((68, 4))
-        self._non_transformed[:, :-1] = np.copy(self._solver.model_points_68)
-        self._non_transformed.transpose()
+        self.non_transformed = np.ones((68, 4))
+        self.non_transformed[:, :-1] = np.copy(self._solver.model_points_68)
+        self.non_transformed.transpose()
 
         self._face_points = self._solver.model_points_68
 
@@ -100,6 +101,7 @@ class VisualDebugPredictor(BasicPredictor):
 
         return imgs, [right_eye_gaze], [left_eye_gaze], [projections], {}
 
+    # noinspection PyUnresolvedReferences
     def move_mouse_to_gaze_pixel(self, cameras: typing.List[CameraHolder], time_now: float):
         """Get mouse position on on screen
 
@@ -155,12 +157,12 @@ def debug_stdout_listener(debug_predictor: VisualDebugPredictor, backend_server:
             # face position change
             if json_dict["type"] == "matrix_change":
                 matrix = json_dict["value"]
-                matrix = np.array(list((map(lambda x: float(x), matrix[1: -1].split(', '))))).reshape((3, 4))
+                matrix = np.array(list((map(lambda t: float(t), matrix[1: -1].split(', '))))).reshape((3, 4))
 
                 debug_predictor._world_to_camera = matrix
 
                 face_points = []
-                for point in debug_predictor._non_transformed:
+                for point in debug_predictor.non_transformed:
                     face_points.append(np.matmul(matrix, point))
 
                 debug_predictor._face_points = np.array(face_points)
