@@ -21,6 +21,6 @@
     "zerorpc": "git+https://github.com/0rpc/zerorpc-node.git"
   },
   "devDependencies": {
-    "electron": "^7.2.4"
+    "electron": "^13.6.6"
   }
 }
